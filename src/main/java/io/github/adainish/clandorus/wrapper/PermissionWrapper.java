@@ -12,8 +12,8 @@ public class PermissionWrapper {
         registerPermissions();
     }
     public void registerPermissions() {
-        registerCommandPermission(clanChatPermission, "The team chat base permission players need to use it");
-        registerCommandPermission(adminPermission, "The team admin permission");
+        registerCommandPermission(clanChatPermission, "The clan chat base permission players need to use it");
+        registerCommandPermission(adminPermission, "The clan admin permission");
     }
     public static void registerCommandPermission(String s) {
         if (s == null || s.isEmpty()) {

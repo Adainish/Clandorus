@@ -204,6 +204,10 @@ public class Util {
         player.sendMessage(new StringTextComponent(((TextUtil.getMessagePrefix()).getString() + message).replaceAll("&([0-9a-fk-or])", "\u00a7$1")), player.getUniqueID());
     }
 
+    public static void sendNoFormat(UUID uuid, String message) {
+        getPlayer(uuid).sendMessage(new StringTextComponent((message).replaceAll("&([0-9a-fk-or])", "\u00a7$1")), uuid);
+    }
+
     public static void sendNoFormat(ServerPlayerEntity player, String message) {
         if (player == null)
             return;

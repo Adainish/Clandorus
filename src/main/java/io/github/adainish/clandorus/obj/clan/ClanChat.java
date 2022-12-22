@@ -16,7 +16,7 @@ public class ClanChat {
             String chatMessage = chatPrefix + playerColour + playerName + " " + chatColour + msg;
             for (UUID uuid : clan.getClanMembers()) {
                 if (Util.isPlayerOnline(uuid)) {
-                    Util.send(uuid, chatMessage);
+                    Util.sendNoFormat(uuid, chatMessage);
                 }
             }
             //do audit log/event post

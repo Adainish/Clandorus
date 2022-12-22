@@ -30,6 +30,7 @@ public class PlayerListener {
                 Clan clan = ClanStorage.getClan(player.getClanID());
                 if (clan == null)
                     throw new NullPointerException("Clan Did not exist on player log-in even though the player data says they have a Team. This is an issue");
+                clan.initialiseNullData();
                 clan.save();
             }
         } catch (NullPointerException e) {

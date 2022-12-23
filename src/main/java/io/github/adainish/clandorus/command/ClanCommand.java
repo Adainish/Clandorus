@@ -7,13 +7,13 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.RewardBuilder;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.obj.clan.Invite;
 import io.github.adainish.clandorus.storage.ClanStorage;
 import io.github.adainish.clandorus.storage.PlayerStorage;
-import io.github.adainish.clandorus.util.Adapters;
 import io.github.adainish.clandorus.util.EconomyUtil;
 import io.github.adainish.clandorus.util.PermissionUtil;
 import io.github.adainish.clandorus.util.Util;
@@ -52,6 +52,20 @@ public class ClanCommand {
                     }
                     return 1;
                 })
+                .then(Commands.literal("rewardbuilder")
+                        .executes(cc ->
+                        {
+                            try {
+                                RewardBuilder builder = new RewardBuilder();
+                                builder.openNewRewardBuilder(cc.getSource().asPlayer());
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            return 1;
+                        })
+                )
                 .then(Commands.literal("bank")
                         .executes(cc -> {
                             try {

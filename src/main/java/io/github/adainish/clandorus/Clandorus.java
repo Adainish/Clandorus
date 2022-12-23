@@ -5,6 +5,7 @@ import com.pixelmonmod.pixelmon.Pixelmon;
 import io.github.adainish.clandorus.command.ClanChatCommand;
 import io.github.adainish.clandorus.command.ClanCommand;
 import io.github.adainish.clandorus.conf.LanguageConfig;
+import io.github.adainish.clandorus.listener.DialogueScreenListener;
 import io.github.adainish.clandorus.listener.PlayerListener;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
@@ -193,6 +194,7 @@ public class Clandorus {
 
     public void initListeners() {
         MinecraftForge.EVENT_BUS.register(new PlayerListener());
+        Pixelmon.EVENT_BUS.register(new DialogueScreenListener());
 //        Pixelmon.EVENT_BUS.register(new BattleListener());
     }
 

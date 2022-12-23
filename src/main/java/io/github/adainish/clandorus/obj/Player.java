@@ -1,6 +1,7 @@
 package io.github.adainish.clandorus.obj;
 
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.RewardBuilder;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.obj.mail.MailBox;
 import io.github.adainish.clandorus.storage.ClanStorage;
@@ -17,6 +18,8 @@ public class Player {
     private UUID clanID;
 
     private MailBox mailBox;
+
+    private transient RewardBuilder rewardBuilder;
 
     public Player(UUID uuid)
     {
@@ -88,5 +91,13 @@ public class Player {
 
     public void setMailBox(MailBox mailBox) {
         this.mailBox = mailBox;
+    }
+
+    public RewardBuilder getRewardBuilder() {
+        return rewardBuilder;
+    }
+
+    public void setRewardBuilder(RewardBuilder rewardBuilder) {
+        this.rewardBuilder = rewardBuilder;
     }
 }

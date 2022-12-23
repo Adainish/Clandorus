@@ -1,8 +1,10 @@
 package io.github.adainish.clandorus.util;
 
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pixelmonmod.pixelmon.api.registries.PixelmonItems;
 import com.pixelmonmod.pixelmon.api.util.helpers.ResourceLocationHelper;
+import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.enumeration.Roles;
 import io.github.adainish.clandorus.obj.clan.Invite;
 import io.github.adainish.clandorus.obj.Player;
@@ -38,7 +40,7 @@ public class Util {
     private static final MinecraftServer SERVER = server;
 
     public static boolean isRole(String value) {
-        for (Roles role: Roles.values()) {
+        for (Roles role : Roles.values()) {
             if (role.name().equalsIgnoreCase(value))
                 return true;
         }
@@ -46,7 +48,7 @@ public class Util {
     }
 
     public static Roles getRole(String value) {
-        for (Roles role: Roles.values()) {
+        for (Roles role : Roles.values()) {
             if (role.name().equalsIgnoreCase(value))
                 return role;
         }
@@ -69,6 +71,7 @@ public class Util {
             return "Invalid player data";
         return player.getName();
     }
+
     public static String getPlayerName(UUID uuid) {
         ServerPlayerEntity playerEntity = getPlayer(uuid);
         if (playerEntity == null)
@@ -97,7 +100,7 @@ public class Util {
         return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, key);
     }
 
-    public static Optional <ServerWorld> getWorld(RegistryKey<World> key) {
+    public static Optional<ServerWorld> getWorld(RegistryKey<World> key) {
         return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getWorld(key));
     }
 
@@ -109,41 +112,36 @@ public class Util {
             .display(new ItemStack(Blocks.GRAY_STAINED_GLASS_PANE, 1))
             .build();
 
-    public boolean isPokeBall()
-    {
+    public boolean isPokeBall() {
 
         return false;
     }
 
-    public boolean isPokeBall(ItemStack stack)
-    {
+    public boolean isPokeBall(ItemStack stack) {
         return stack.getItem().getRegistryName().equals(PixelmonItems.poke_ball.getRegistryName());
     }
 
-    public static String getItemStackName(CompoundNBT compoundNBT)
-    {
+    public static String getItemStackName(CompoundNBT compoundNBT) {
         ItemStack stack = ItemStack.read(compoundNBT);
 
         return getItemStackName(stack);
     }
     // TODO: 21/12/2022 Add capitalisation reformatted for lower cased word translations 
 
-    public static String getItemStackName(ItemStack stack)
-    {
+    public static String getItemStackName(ItemStack stack) {
         String formattedName = null;
 
         if (stack.hasDisplayName()) {
             formattedName = stack.getDisplayName().getUnformattedComponentText();
         } else {
-           formattedName = stack.getItem().getRegistryName().getPath().replace("_", " ");
+            formattedName = stack.getItem().getRegistryName().getPath().replace("_", " ");
         }
         if (formattedName.isEmpty())
             formattedName = "Name Not Stored";
         return formattedName;
     }
 
-    public static void sendSuccessFullMessage(ServerPlayerEntity playerEntity, String message)
-    {
+    public static void sendSuccessFullMessage(ServerPlayerEntity playerEntity, String message) {
         StringTextComponent textComponent = new StringTextComponent(formattedString(TextUtil.getMessagePrefix().getString() + message));
         Style componentStyle = Style.EMPTY;
         componentStyle = componentStyle.applyFormatting(TextFormatting.GREEN);
@@ -151,8 +149,7 @@ public class Util {
         playerEntity.sendMessage(textComponent, playerEntity.getUniqueID());
     }
 
-    public static void sendFailMessage(ServerPlayerEntity playerEntity, String message)
-    {
+    public static void sendFailMessage(ServerPlayerEntity playerEntity, String message) {
         StringTextComponent textComponent = new StringTextComponent(formattedString(TextUtil.getMessagePrefix().getString() + message));
         Style componentStyle = Style.EMPTY;
         componentStyle = componentStyle.applyFormatting(TextFormatting.RED);
@@ -174,7 +171,7 @@ public class Util {
     }
 
     public static void sendInvite(UUID uuid, String message, Invite invite) {
-        TextComponent textComponent = new StringTextComponent(Util.formattedString(TextUtil.getMessagePrefix().getString()+message));
+        TextComponent textComponent = new StringTextComponent(Util.formattedString(TextUtil.getMessagePrefix().getString() + message));
         Style componentStyle = Style.EMPTY;
         componentStyle = componentStyle.applyFormatting(TextFormatting.YELLOW);
         componentStyle = componentStyle.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clandorus acceptinvite " + invite.getClan().getClanIdentifier()));
@@ -183,13 +180,13 @@ public class Util {
     }
 
     public static void sendArray(UUID uuid, List<String> message) {
-        for (String s:message) {
+        for (String s : message) {
             getPlayer(uuid).sendMessage(new StringTextComponent(((TextUtil.getMessagePrefix()).getString() + s).replaceAll("&([0-9a-fk-or])", "\u00a7$1")), uuid);
         }
     }
 
     public static void sendArrayUnformatted(UUID uuid, List<String> message) {
-        for (String s:message) {
+        for (String s : message) {
             getPlayer(uuid).sendMessage(new StringTextComponent((s).replaceAll("&([0-9a-fk-or])", "\u00a7$1")), uuid);
         }
     }
@@ -229,13 +226,22 @@ public class Util {
         return s.replaceAll("&", "§");
     }
 
-    public static List <String> formattedArrayList(List<String> list) {
+    public static List<String> formattedArrayList(List<String> list) {
 
         List<String> formattedList = new ArrayList<>();
-        for (String s:list) {
+        for (String s : list) {
             formattedList.add(formattedString(s));
         }
 
         return formattedList;
+    }
+
+    public static void runCommand(String cmd)
+    {
+        try {
+            Clandorus.getServer().getCommandManager().getDispatcher().execute(cmd, Clandorus.getServer().getCommandSource());
+        } catch (CommandSyntaxException e) {
+            Clandorus.log.error(e);
+        }
     }
 }

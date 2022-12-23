@@ -5,4 +5,9 @@ import java.util.List;
 
 public class MailBox {
     public List<MailBox> mailBoxList = new ArrayList<>();
+
+    public MailBox()
+    {
+
+    }
 }

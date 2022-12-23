@@ -178,9 +178,7 @@ public class RewardBuilder {
                     .onClick(b ->
                     {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.item, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.item, player).sendTo(b.getPlayer()), false);
                     })
                     .build();
         else displayItemStack = GooeyButton.builder()
@@ -194,9 +192,7 @@ public class RewardBuilder {
                 .onClick(b ->
                 {
                     UIManager.closeUI(b.getPlayer());
-                    Scheduling.schedule(2, scheduledTask -> {
-                        dialogueInputScreenBuilder(BuilderAction.item, player).sendTo(b.getPlayer());
-                    }, false);
+                    Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.item, player).sendTo(b.getPlayer()), false);
                 })
                 .build();
 
@@ -209,9 +205,7 @@ public class RewardBuilder {
                     .display(new ItemStack(Items.BARRIER))
                     .onClick(b -> {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.lore, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.lore, player).sendTo(b.getPlayer()), false);
                     })
                     .build();
         } else {
@@ -223,9 +217,7 @@ public class RewardBuilder {
                     .display(new ItemStack(Items.WRITTEN_BOOK))
                     .onClick(b -> {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.lore, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.lore, player).sendTo(b.getPlayer()), false);
                     })
                     .lore(Util.formattedArrayList(buttonLore))
                     .build();
@@ -241,9 +233,7 @@ public class RewardBuilder {
                     .onClick(b ->
                     {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.title, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.title, player).sendTo(b.getPlayer()), false);
                     })
                     .lore(Util.formattedArrayList(Arrays.asList("&cYou still need to set up the reward title!")))
                     .build();
@@ -254,9 +244,7 @@ public class RewardBuilder {
                     .onClick(b ->
                     {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.title, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.title, player).sendTo(b.getPlayer()), false);
                     })
                     .lore(Util.formattedArrayList(Arrays.asList("&aYou've set up the following title for the display: %title%"
                             .replace("%title%", this.reward.displayTitle))))
@@ -271,9 +259,7 @@ public class RewardBuilder {
                     .onClick(b ->
                     {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.commands, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.commands, player).sendTo(b.getPlayer()), false);
                     })
                     .display(new ItemStack(Items.BARRIER))
                     .build();
@@ -289,9 +275,7 @@ public class RewardBuilder {
                     .onClick(b ->
                     {
                         UIManager.closeUI(b.getPlayer());
-                        Scheduling.schedule(2, scheduledTask -> {
-                            dialogueInputScreenBuilder(BuilderAction.commands, player).sendTo(b.getPlayer());
-                        }, false);
+                        Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.commands, player).sendTo(b.getPlayer()), false);
                     })
                     .build();
         }
@@ -307,9 +291,7 @@ public class RewardBuilder {
                         .onClick(b ->
                         {
                             UIManager.closeUI(b.getPlayer());
-                            Scheduling.schedule(2, scheduledTask -> {
-                                dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer());
-                            }, false);
+                            Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer()), false);
                         })
                         .display(new ItemStack(Items.BARRIER))
                         .build();
@@ -322,9 +304,7 @@ public class RewardBuilder {
                         .onClick(b ->
                         {
                             UIManager.closeUI(b.getPlayer());
-                            Scheduling.schedule(2, scheduledTask -> {
-                                dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer());
-                            }, false);
+                            Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer()), false);
                         })
                         .lore(Util.formattedArrayList(idArray))
                         .display(new ItemStack(Items.MAP))

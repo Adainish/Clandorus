@@ -38,7 +38,7 @@ public class RewardBuilder {
         this.setItemStack(stack);
         this.setLore(lore);
         this.setGUITitle(title);
-
+        this.setCommands(commands);
     }
 
     public void setItemStack(ItemStack stack)

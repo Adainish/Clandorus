@@ -135,6 +135,12 @@ public class RewardBuilder {
                 builder.setText(Util.formattedString("&7Provide the GUI Title you want to use for the Reward!"));
                 break;
             }
+            case identifier:
+            {
+                builder.setTitle(Util.formattedString("&bIdentifier"));
+                builder.setText(Util.formattedString("&7Provide the identifier under which the reward needs to be saved in the reward registry!"));
+                break;
+            }
             case commands:
             {
                 builder.setTitle(Util.formattedString("&bCommand"));
@@ -277,7 +283,7 @@ public class RewardBuilder {
             loreList.addAll(this.reward.commandList);
 
             rewards = GooeyButton.builder()
-                    .title("&aConfigured Commands!")
+                    .title(Util.formattedString("&aConfigured Commands!"))
                     .display(new ItemStack(Items.COMMAND_BLOCK))
                     .lore(Util.formattedArrayList(loreList))
                     .onClick(b ->
@@ -289,6 +295,42 @@ public class RewardBuilder {
                     })
                     .build();
         }
+
+        GooeyButton identifier;
+
+        if (this.reward.isConfigBased)
+        {
+            if (this.reward.identifier == null || this.reward.identifier.isEmpty())
+            {
+                identifier = GooeyButton.builder()
+                        .title(Util.formattedString("&cIdentifier has not been set up!"))
+                        .onClick(b ->
+                        {
+                            UIManager.closeUI(b.getPlayer());
+                            Scheduling.schedule(2, scheduledTask -> {
+                                dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer());
+                            }, false);
+                        })
+                        .display(new ItemStack(Items.BARRIER))
+                        .build();
+            } else {
+                List<String> idArray = new ArrayList<>();
+                idArray.add("&7Your reward will be stored under the following id:");
+                idArray.add("&b%identifier%".replace("%identifier%", this.reward.identifier));
+                identifier = GooeyButton.builder()
+                        .title(Util.formattedString("&aIdentifier has been set up!"))
+                        .onClick(b ->
+                        {
+                            UIManager.closeUI(b.getPlayer());
+                            Scheduling.schedule(2, scheduledTask -> {
+                                dialogueInputScreenBuilder(BuilderAction.identifier, player).sendTo(b.getPlayer());
+                            }, false);
+                        })
+                        .lore(Util.formattedArrayList(idArray))
+                        .display(new ItemStack(Items.MAP))
+                        .build();
+            }
+        } else identifier = filler;
 
         GooeyButton finishBuilder = GooeyButton.builder()
                 .title(Util.formattedString("&aFinish Building"))
@@ -310,6 +352,12 @@ public class RewardBuilder {
         builder.set(1, 3, lore);
         builder.set(1, 5, title);
         builder.set(1, 7, rewards);
+
+        if (this.reward.isConfigBased)
+        {
+            builder.set(2, 2, identifier);
+        }
+
         builder.set(2, 4, finishBuilder);
 
         return GooeyPage.builder().template(builder.build()).title(Util.formattedString("&bReward Builder")).build();

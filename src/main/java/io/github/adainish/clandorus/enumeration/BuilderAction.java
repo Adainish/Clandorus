@@ -4,6 +4,7 @@ public enum BuilderAction {
     title,
     lore,
     commands,
+    identifier,
     item,
     none
 }

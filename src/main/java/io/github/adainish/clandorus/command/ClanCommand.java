@@ -52,6 +52,13 @@ public class ClanCommand {
                     }
                     return 1;
                 })
+                .then(Commands.literal("rewardregistry")
+                        .executes(cc ->
+                        {
+                            Clandorus.rewardRegistry.viewRegistry(cc.getSource().asPlayer());
+                            return 1;
+                        })
+                )
                 .then(Commands.literal("rewardbuilder")
                         .executes(cc ->
                         {

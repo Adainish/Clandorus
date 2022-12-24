@@ -5,10 +5,12 @@ import com.pixelmonmod.pixelmon.Pixelmon;
 import io.github.adainish.clandorus.command.ClanChatCommand;
 import io.github.adainish.clandorus.command.ClanCommand;
 import io.github.adainish.clandorus.conf.LanguageConfig;
+import io.github.adainish.clandorus.conf.RewardConfig;
 import io.github.adainish.clandorus.listener.DialogueScreenListener;
 import io.github.adainish.clandorus.listener.PlayerListener;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
+import io.github.adainish.clandorus.registry.RewardRegistry;
 import io.github.adainish.clandorus.tasks.UpdateClanDataTask;
 import io.github.adainish.clandorus.tasks.UpdateInvitesTask;
 import io.github.adainish.clandorus.wrapper.ClanWrapper;
@@ -62,6 +64,8 @@ public class Clandorus {
     public static PermissionWrapper permissionWrapper;
 
     public static List<Task> tasks = new ArrayList<>();
+
+    public static RewardRegistry rewardRegistry;
 
     public Clandorus() {
         // Register the setup method for modloading
@@ -124,7 +128,9 @@ public class Clandorus {
         loadClanWrapper();
         initListeners();
         initTasks();
+        loadRewardRegistry();
     }
+
 
     @SubscribeEvent
     public void onServerShutDown(FMLServerStoppingEvent event)
@@ -151,11 +157,13 @@ public class Clandorus {
     public void setupConfigs() {
         log.log(Level.WARN, "Setting up config data to be read by Clandorus");
         LanguageConfig.getConfig().setup();
+        RewardConfig.getConfig().setup();
     }
 
     public void loadConfigs() {
         log.log(Level.WARN, "Loading and Reading Config Data for Clandorus");
         LanguageConfig.getConfig().load();
+        RewardConfig.getConfig().load();
     }
 
     public void initConfig() {
@@ -169,12 +177,19 @@ public class Clandorus {
         inviteWrapper = new InviteWrapper();
     }
 
+    public void loadRewardRegistry()
+    {
+        rewardRegistry = new RewardRegistry();
+    }
+
+
     public void reload()
     {
         log.warn("Reload requested, this isn't advised! If anything goes wrong we recommend rebooting your server over reloading!");
         shutdownTasks();
         setupConfigs();
         loadConfigs();
+        loadRewardRegistry();
     }
 
     public void initTasks()

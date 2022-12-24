@@ -195,6 +195,11 @@ public class Util {
         getPlayer(uuid).sendMessage(new StringTextComponent(((TextUtil.getMessagePrefix()).getString() + message).replaceAll("&([0-9a-fk-or])", "\u00a7$1")), uuid);
     }
 
+    public static String getResourceLocationStringFromItemStack(ItemStack stack)
+    {
+        return stack.getItem().getRegistryName().toString();
+    }
+
     public static void send(ServerPlayerEntity player, String message) {
         if (player == null)
             return;

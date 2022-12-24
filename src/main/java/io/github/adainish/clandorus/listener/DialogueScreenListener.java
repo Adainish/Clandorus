@@ -1,8 +1,10 @@
 package io.github.adainish.clandorus.listener;
 
 import com.pixelmonmod.pixelmon.api.events.dialogue.DialogueInputEvent;
+import com.pixelmonmod.pixelmon.api.util.Scheduling;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.storage.PlayerStorage;
+import net.minecraft.entity.ai.brain.schedule.Schedule;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -24,13 +26,17 @@ public class DialogueScreenListener {
                     case commands:
                     {
                         player.getRewardBuilder().addCommand(event.getInput());
-                        player.getRewardBuilder().openRewardBuilder(player);
+                        Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().openRewardBuilder(player);
+                        } , false);
                         break;
                     }
                     case title:
                     {
                         player.getRewardBuilder().setGUITitle(event.getInput());
-                        player.getRewardBuilder().openRewardBuilder(player);
+                        Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().openRewardBuilder(player);
+                        } , false);
                         break;
                     }
                     case item:
@@ -41,13 +47,17 @@ public class DialogueScreenListener {
                             item = ForgeRegistries.ITEMS.getValue(location).getItem();
                         else item = Items.PAPER;
                         player.getRewardBuilder().setItemStack(new ItemStack(item));
-                        player.getRewardBuilder().openRewardBuilder(player);
+                        Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().openRewardBuilder(player);
+                        } , false);
                         break;
                     }
                     case lore:
                     {
                         player.getRewardBuilder().addLoreString(event.getInput());
-                        player.getRewardBuilder().openRewardBuilder(player);
+                        Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().openRewardBuilder(player);
+                        } , false);
                         break;
                     }
                     default:

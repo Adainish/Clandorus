@@ -87,6 +87,13 @@ public class RewardBuilder {
         return this.reward;
     }
 
+    public void buildAndReturnToMailBuilder(Player player)
+    {
+        Reward buildReward = buildReward();
+        player.getMailBuilder().getMail().getRewardList().add(buildReward);
+        player.getMailBuilder().openMailBuilder(player);
+    }
+
     public void openRewardBuilder(Player player)
     {
         ServerPlayerEntity playerEntity = Util.getPlayer(player.getUuid());
@@ -421,8 +428,11 @@ public class RewardBuilder {
                 .display(new ItemStack(Items.MAP))
                 .onClick(b ->
                 {
-                    UIManager.closeUI(b.getPlayer());
-                    //send to wherever they need to be
+                    if (player.getMailBuilder() != null) {
+                        buildAndReturnToMailBuilder(player);
+                    } else {
+                        UIManager.closeUI(b.getPlayer());
+                    }
                 })
                 .build();
 

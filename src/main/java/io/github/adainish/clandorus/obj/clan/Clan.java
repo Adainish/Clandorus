@@ -302,12 +302,14 @@ public class Clan {
         return false;
     }
 
-    public List<Player> memberPlayerDaya() {
+    public List<Player> memberPlayerData() {
         List<Player> players = new ArrayList<>();
 
         for (UUID uuid : clanMembers) {
             Player p = PlayerStorage.getPlayer(uuid);
-            players.add(p);
+            if (p != null) {
+                players.add(p);
+            }
         }
 
         return players;
@@ -316,7 +318,7 @@ public class Clan {
     public List<Button> memberButtons() {
         List<Button> buttons = new ArrayList<>();
 
-        for (Player p : memberPlayerDaya()) {
+        for (Player p : memberPlayerData()) {
             Item playerSkull = Items.PLAYER_HEAD;
             CompoundNBT nbt = new CompoundNBT();
             ItemStack skullStack;

@@ -8,6 +8,8 @@ import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.util.Adapters;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ClanStorage {
@@ -134,16 +136,57 @@ public class ClanStorage {
         if (Clandorus.clanWrapper.clanCache.containsKey(uuid))
             return Clandorus.clanWrapper.clanCache.get(uuid);
 
-        File guildFile = new File(dir, "%uuid%.json".replaceAll("%uuid%", String.valueOf(uuid)));
+        File clanFile = new File(dir, "%uuid%.json".replaceAll("%uuid%", String.valueOf(uuid)));
         Gson gson = Adapters.PRETTY_MAIN_GSON;
         JsonReader reader = null;
         try {
-            reader = new JsonReader(new FileReader(guildFile));
+            reader = new JsonReader(new FileReader(clanFile));
         } catch (FileNotFoundException e) {
             Clandorus.log.error("Provided Clan did not exist in storage, could not execute action");
             return null;
         }
 
         return gson.fromJson(reader, Clan.class);
+    }
+
+    public static List<Clan> getAllClans()
+    {
+        List<Clan> clans = new ArrayList<>();
+        File dir = Clandorus.clanStorageDir;
+        if (dir != null) {
+            for (File f : dir.listFiles()) {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(f.getName().replace(".json", ""));
+                } catch (IllegalArgumentException e)
+                {
+                    continue;
+                }
+                Clan clan = getClan(uuid);
+                clans.add(clan);
+            }
+        }
+        return clans;
+    }
+
+    public static List<UUID> getAllClanUUIDS()
+    {
+        List<UUID> uuids = new ArrayList<>();
+        File dir = Clandorus.clanStorageDir;
+        if (dir != null) {
+            for (File f : dir.listFiles()) {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(f.getName().replace(".json", ""));
+                } catch (IllegalArgumentException e)
+                {
+                    continue;
+                }
+
+                uuids.add(uuid);
+
+            }
+        }
+        return uuids;
     }
 }

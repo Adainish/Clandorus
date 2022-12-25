@@ -8,6 +8,8 @@ import io.github.adainish.clandorus.util.Adapters;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerStorage {
@@ -65,6 +67,64 @@ public class PlayerStorage {
         }
 
         player.updateCache();
+    }
+
+    public static List<UUID> getAllPlayerUUIDS()
+    {
+        List<UUID> uuids = new ArrayList<>();
+
+        File dir = Clandorus.getPlayerStorageDir();
+        if (dir != null) {
+            for (File f : dir.listFiles()) {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(f.getName().replace(".json", ""));
+                } catch (IllegalArgumentException e)
+                {
+                    continue;
+                }
+
+                uuids.add(uuid);
+
+            }
+        }
+
+        return uuids;
+    }
+
+    public static List<Player> getAllPlayers()
+    {
+
+        List<UUID> addedPlayers = new ArrayList<>();
+
+        List<Player> playerList = new ArrayList<>();
+
+        for (Player p:Clandorus.clanWrapper.playerCache.values()) {
+            playerList.add(p);
+            addedPlayers.add(p.getUuid());
+        }
+
+        File dir = Clandorus.getPlayerStorageDir();
+        if (dir != null) {
+            for (File f : dir.listFiles()) {
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(f.getName().replace(".json", ""));
+                } catch (IllegalArgumentException e)
+                {
+                    continue;
+                }
+                if (addedPlayers.contains(uuid))
+                    continue;
+                Player p = getPlayer(uuid);
+                if (p == null)
+                    continue;
+                playerList.add(p);
+                addedPlayers.add(uuid);
+            }
+        }
+
+        return playerList;
     }
 
     public static Player getPlayer(UUID uuid) {

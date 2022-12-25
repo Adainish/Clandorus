@@ -2,9 +2,9 @@ package io.github.adainish.clandorus.listener;
 
 import com.pixelmonmod.pixelmon.api.events.dialogue.DialogueInputEvent;
 import com.pixelmonmod.pixelmon.api.util.Scheduling;
+import io.github.adainish.clandorus.enumeration.BuilderAction;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.storage.PlayerStorage;
-import net.minecraft.entity.ai.brain.schedule.Schedule;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -12,7 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class DialogueScreenListener {
+public class RewardBuilderDialogueInputListener {
     @SubscribeEvent
     public void onDialogueScreenEvent(DialogueInputEvent.Submitted event)
     {
@@ -27,6 +27,7 @@ public class DialogueScreenListener {
                     {
                         player.getRewardBuilder().addCommand(event.getInput());
                         Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().setActiveBuilderAction(BuilderAction.none);
                             player.getRewardBuilder().openRewardBuilder(player);
                         } , false);
                         break;
@@ -35,6 +36,7 @@ public class DialogueScreenListener {
                     {
                         player.getRewardBuilder().setGUITitle(event.getInput());
                         Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().setActiveBuilderAction(BuilderAction.none);
                             player.getRewardBuilder().openRewardBuilder(player);
                         } , false);
                         break;
@@ -48,6 +50,7 @@ public class DialogueScreenListener {
                         else item = Items.PAPER;
                         player.getRewardBuilder().setItemStack(new ItemStack(item));
                         Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().setActiveBuilderAction(BuilderAction.none);
                             player.getRewardBuilder().openRewardBuilder(player);
                         } , false);
                         break;
@@ -56,6 +59,7 @@ public class DialogueScreenListener {
                     {
                         player.getRewardBuilder().addLoreString(event.getInput());
                         Scheduling.schedule(2, () -> {
+                            player.getRewardBuilder().setActiveBuilderAction(BuilderAction.none);
                             player.getRewardBuilder().openRewardBuilder(player);
                         } , false);
                         break;

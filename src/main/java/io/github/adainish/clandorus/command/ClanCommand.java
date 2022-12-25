@@ -7,6 +7,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.MailBuilder;
 import io.github.adainish.clandorus.api.RewardBuilder;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.obj.Player;
@@ -56,6 +57,30 @@ public class ClanCommand {
                         .executes(cc ->
                         {
                             Clandorus.rewardRegistry.viewRegistry(cc.getSource().asPlayer());
+                            return 1;
+                        })
+                )
+                .then(Commands.literal("mailbox")
+                        .executes(cc ->
+                        {
+                            Player player = PlayerStorage.getPlayer(cc.getSource().asPlayer().getUniqueID());
+                            if (player == null) {
+                                Util.sendFailMessage(cc.getSource().asPlayer(), LanguageConfig.getConfig().get().node("Player", "FailLoadingData").getString());
+                                return 1;
+                            }
+                            player.getMailBox().openMailBox(player);
+                            return 1;
+                        })
+                )
+                .then(Commands.literal("mailbuilder")
+                        .executes(cc -> {
+                            try {
+                                MailBuilder builder = new MailBuilder();
+                                builder.openNewMailBuilder(cc.getSource().asPlayer());
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                             return 1;
                         })
                 )

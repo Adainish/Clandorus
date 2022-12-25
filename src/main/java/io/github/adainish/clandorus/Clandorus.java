@@ -6,7 +6,8 @@ import io.github.adainish.clandorus.command.ClanChatCommand;
 import io.github.adainish.clandorus.command.ClanCommand;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.conf.RewardConfig;
-import io.github.adainish.clandorus.listener.DialogueScreenListener;
+import io.github.adainish.clandorus.listener.MailBuilderDialogueInputListener;
+import io.github.adainish.clandorus.listener.RewardBuilderDialogueInputListener;
 import io.github.adainish.clandorus.listener.PlayerListener;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
@@ -68,7 +69,6 @@ public class Clandorus {
     public static RewardRegistry rewardRegistry;
 
     public Clandorus() {
-        // Register the setup method for modloading
         instance = this;
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
@@ -209,7 +209,8 @@ public class Clandorus {
 
     public void initListeners() {
         MinecraftForge.EVENT_BUS.register(new PlayerListener());
-        Pixelmon.EVENT_BUS.register(new DialogueScreenListener());
+        Pixelmon.EVENT_BUS.register(new RewardBuilderDialogueInputListener());
+        Pixelmon.EVENT_BUS.register(new MailBuilderDialogueInputListener());
 //        Pixelmon.EVENT_BUS.register(new BattleListener());
     }
 

@@ -25,6 +25,7 @@ public class PlayerListener {
             if (player == null)
                 throw new NullPointerException("Player null even after making fresh player data? That's not good! Please contact the developer with more info!");
             player.setUserName(event.getPlayer().getName().getUnformattedComponentText());
+            player.initialiseNull();
             player.savePlayer();
             if (player.inClan() && !player.clanCached()) {
                 Clan clan = ClanStorage.getClan(player.getClanID());

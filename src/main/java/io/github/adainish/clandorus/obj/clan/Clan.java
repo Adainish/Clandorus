@@ -18,7 +18,7 @@ import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.util.helpers.SpriteItemHelper;
 import io.github.adainish.clandorus.Clandorus;
-import io.github.adainish.clandorus.api.ClanEvent;
+import io.github.adainish.clandorus.api.events.ClanEvent;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.enumeration.Roles;
 import io.github.adainish.clandorus.obj.*;
@@ -91,7 +91,8 @@ public class Clan {
             clanChat = new ClanChat();
     }
 
-    public void disband() {
+    public void disband(UUID disbander) {
+        MinecraftForge.EVENT_BUS.post(new ClanEvent.ClanDeleteEvent(this, disbander));
         for (UUID uuid : clanMembers) {
             Player player = PlayerStorage.getPlayer(uuid);
             if (player == null)
@@ -99,7 +100,7 @@ public class Clan {
             player.setClanID(null);
             player.savePlayer();
         }
-        ClanStorage.saveClan(clanIdentifier);
+        ClanStorage.safeClanRemoval(clanIdentifier);
     }
 
     public List<ServerPlayerEntity> getOnlineMembers() {
@@ -206,7 +207,7 @@ public class Clan {
     }
 
     public void save() {
-        ClanStorage.saveClan(this);
+        ClanStorage.safeClanRemoval(this);
     }
 
     public void updateCache() {

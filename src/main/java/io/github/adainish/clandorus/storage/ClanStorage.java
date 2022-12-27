@@ -89,7 +89,7 @@ public class ClanStorage {
         }
     }
 
-    public static void saveClan(UUID clanUUID) {
+    public static void safeClanRemoval(UUID clanUUID) {
         File dir = Clandorus.clanStorageDir;
         File file = new File(dir, "%uuid%.json".replaceAll("%uuid%", String.valueOf(clanUUID)));
         file.deleteOnExit();
@@ -98,7 +98,7 @@ public class ClanStorage {
         }
     }
 
-    public static void saveClan(Clan clan) {
+    public static void safeClanRemoval(Clan clan) {
 
         File dir = Clandorus.clanStorageDir;
         dir.mkdirs();

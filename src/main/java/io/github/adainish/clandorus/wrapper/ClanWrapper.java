@@ -18,7 +18,7 @@ public class ClanWrapper {
 
     }
 
-    public Clan getClanFromName(String name)
+    public Clan getCachedClanFromName(String name)
     {
         for (Clan clan: clanCache.values()) {
             if (clan.getClanName().equalsIgnoreCase(name))
@@ -40,6 +40,6 @@ public class ClanWrapper {
     }
 
     public void safelyHandleTeamSaving(Clan clan) {
-        ClanStorage.saveClan(clan);
+        ClanStorage.safeClanRemoval(clan);
     }
 }

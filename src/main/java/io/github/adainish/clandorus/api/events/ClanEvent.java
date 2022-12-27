@@ -1,8 +1,11 @@
-package io.github.adainish.clandorus.api;
+package io.github.adainish.clandorus.api.events;
 
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
+
+import java.util.UUID;
 
 public class ClanEvent extends Event {
     private Clan clan;
@@ -15,6 +18,8 @@ public class ClanEvent extends Event {
         return clan;
     }
 
+
+    @Cancelable
     public static class ClanChatEvent extends ClanEvent {
         Player sender;
         String message;
@@ -69,7 +74,7 @@ public class ClanEvent extends Event {
 
     public static class ClanDeleteEvent extends ClanEvent {
 
-        public ClanDeleteEvent(Clan clan) {
+        public ClanDeleteEvent(Clan clan, UUID disbander) {
             super(clan);
         }
     }

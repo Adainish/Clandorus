@@ -291,7 +291,7 @@ public class ClanCommand {
                                     if (clan == null)
                                         throw new Exception("Clan Retrieval Exception");
                                     if (clan.isLeader(player.getUuid())) {
-                                        clan.disband();
+                                        clan.disband(player.getUuid());
                                         Util.send(player.getUuid(), LanguageConfig.getConfig().get().node("Clan", "Disbanded").getString());
                                     } else {
                                         Util.send(player.getUuid(), LanguageConfig.getConfig().get().node("Clan", "LeaderOnlyDisband").getString());

@@ -1,7 +1,9 @@
 package io.github.adainish.clandorus.obj.clan;
 
+import io.github.adainish.clandorus.api.events.ClanEvent;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.util.Util;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.UUID;
 
@@ -12,14 +14,16 @@ public class ClanChat {
     public ClanChat() {}
     public void sendClanMessage(Clan clan, Player sender, String msg) {
         if (sender.inClan()) {
-            String playerName = Util.getPlayerName(sender.getUuid());
-            String chatMessage = chatPrefix + playerColour + playerName + " " + chatColour + msg;
-            for (UUID uuid : clan.getClanMembers()) {
-                if (Util.isPlayerOnline(uuid)) {
-                    Util.sendNoFormat(uuid, chatMessage);
+            if (MinecraftForge.EVENT_BUS.post(new ClanEvent.ClanChatEvent(clan, sender, msg)))
+            {
+                String playerName = Util.getPlayerName(sender.getUuid());
+                String chatMessage = chatPrefix + playerColour + playerName + " " + chatColour + msg;
+                for (UUID uuid : clan.getClanMembers()) {
+                    if (Util.isPlayerOnline(uuid)) {
+                        Util.sendNoFormat(uuid, chatMessage);
+                    }
                 }
             }
-            //do audit log/event post
         } else Util.send(sender.getUuid(), "&cYou're not currently in a clan, please first join a clan!");
     }
 }

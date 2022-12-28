@@ -18,7 +18,7 @@ public class MailBuilderDialogueInputListener {
         {
             if (player.getMailBuilder() != null)
             {
-                if (Objects.requireNonNull(player.getMailBuilder().getMailAction()) == MailAction.setting_mail_text) {
+                if (player.getMailBuilder().getMailAction() != null && player.getMailBuilder().getMailAction() == MailAction.setting_mail_text) {
                     player.getMailBuilder().getMail().setMessage(event.getInput());
                     Scheduling.schedule(2, () -> {
                         player.getMailBuilder().setMailAction(MailAction.none);

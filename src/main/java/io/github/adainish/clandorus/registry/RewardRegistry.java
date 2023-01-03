@@ -65,6 +65,13 @@ public class RewardRegistry {
         return stringBuilder.toString();
     }
 
+    public void saveAll()
+    {
+        Clandorus.log.warn("Saving all cached rewards to config, If you've made any edits you forgot to save these will now be applied!");
+        for (Reward rw:rewardCache.values()) {
+            saveToConfig(rw);
+        }
+    }
 
     public void saveToConfig(Reward reward)
     {

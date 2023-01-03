@@ -7,12 +7,39 @@ import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.util.Adapters;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class PlayerStorage {
+
+    public static void makePlayer(UUID uuid) {
+        File dir = Clandorus.getPlayerStorageDir();
+        dir.mkdirs();
+
+
+        Player playerData = new Player(uuid);
+
+        File file = new File(dir, "%uuid%.json".replaceAll("%uuid%", String.valueOf(uuid)));
+        if (file.exists()) {
+            return;
+        }
+
+        Gson gson = Adapters.PRETTY_MAIN_GSON;
+        String json = gson.toJson(playerData);
+
+        try {
+            file.createNewFile();
+            FileWriter writer = new FileWriter(file);
+            writer.write(json);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void makePlayer(ServerPlayerEntity player) {
         File dir = Clandorus.getPlayerStorageDir();
         dir.mkdirs();
@@ -127,6 +154,7 @@ public class PlayerStorage {
         return playerList;
     }
 
+    @Nullable
     public static Player getPlayer(UUID uuid) {
         File dir = Clandorus.getPlayerStorageDir();
         dir.mkdirs();

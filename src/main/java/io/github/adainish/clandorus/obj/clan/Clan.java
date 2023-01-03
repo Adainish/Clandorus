@@ -67,6 +67,7 @@ public class Clan {
         setPokemonStorage(new ClanPokemonStorage());
         setClanBank(new Bank());
         setClanChat(new ClanChat());
+        setAuditLog(new AuditLog());
     }
 
     public Clan(Player leader, String name) {
@@ -79,6 +80,7 @@ public class Clan {
         setItemStorage(new ClanItemStorage());
         setPokemonStorage(new ClanPokemonStorage());
         setClanBank(new Bank());
+        setAuditLog(new AuditLog());
     }
 
     public void initialiseNullData()

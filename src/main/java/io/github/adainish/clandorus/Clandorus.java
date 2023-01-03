@@ -11,6 +11,7 @@ import io.github.adainish.clandorus.listener.RewardBuilderDialogueInputListener;
 import io.github.adainish.clandorus.listener.PlayerListener;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
+import io.github.adainish.clandorus.registry.ClanGymRegistry;
 import io.github.adainish.clandorus.registry.RewardRegistry;
 import io.github.adainish.clandorus.tasks.UpdateClanDataTask;
 import io.github.adainish.clandorus.tasks.UpdateInvitesTask;
@@ -67,6 +68,8 @@ public class Clandorus {
     public static List<Task> tasks = new ArrayList<>();
 
     public static RewardRegistry rewardRegistry;
+
+    public static ClanGymRegistry clanGymRegistry;
 
     public Clandorus() {
         instance = this;
@@ -140,6 +143,9 @@ public class Clandorus {
         clanWrapper.playerCache.values().forEach(Player::savePlayer);
         log.warn("Saving Clan Data");
         clanWrapper.clanCache.values().forEach(Clan::save);
+        if (rewardRegistry != null) {
+            rewardRegistry.saveAll();
+        }
     }
 
     public void initDirs() {
@@ -182,11 +188,18 @@ public class Clandorus {
         rewardRegistry = new RewardRegistry();
     }
 
+    public void loadClanGymRegistry()
+    {
+        clanGymRegistry = new ClanGymRegistry();
+    }
 
     public void reload()
     {
         log.warn("Reload requested, this isn't advised! If anything goes wrong we recommend rebooting your server over reloading!");
         shutdownTasks();
+        if (rewardRegistry != null) {
+            rewardRegistry.saveAll();
+        }
         setupConfigs();
         loadConfigs();
         loadRewardRegistry();

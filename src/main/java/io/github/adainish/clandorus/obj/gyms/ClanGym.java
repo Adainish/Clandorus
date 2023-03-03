@@ -11,7 +11,9 @@ import com.pixelmonmod.pixelmon.battles.api.rules.clauses.BattleClause;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
+import io.github.adainish.clandorus.obj.HoldRequirements;
 import io.github.adainish.clandorus.obj.Location;
+import io.github.adainish.clandorus.obj.OccupyingHolder;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.storage.PlayerStorage;
 import net.minecraft.entity.Entity;
@@ -35,6 +37,10 @@ public class ClanGym {
     public List<String> battleProperties = new ArrayList<>();
 
     public long lastChallenged;
+
+    public HoldRequirements holdRequirements;
+
+    public OccupyingHolder occupyingHolder;
 
     public Location location;
 
@@ -163,7 +169,7 @@ public class ClanGym {
             for (Entity e:entities) {
                 if (isClanGymNPC(e)) {
                     if (e.getPersistentData().getString("clandorusGymID").equals(identifier)) {
-                        Clandorus.log.log(Level.WARN, "Detected existing clandorys gym npc " + identifier + " loading to cache, no new one has to be created");
+                        Clandorus.log.log(Level.WARN, "Detected existing clandorus gym npc " + identifier + " loading to cache, no new one has to be created");
                         NPCTrainer trainer = (NPCTrainer) e;
                         if (trainer.getPosX() != storedLocation.getPosX() || trainer.getPosY() != storedLocation.getPosY() || trainer.getPosZ() != storedLocation.getPosZ())
                         {

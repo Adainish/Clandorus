@@ -6,9 +6,7 @@ import io.github.adainish.clandorus.command.ClanChatCommand;
 import io.github.adainish.clandorus.command.ClanCommand;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.conf.RewardConfig;
-import io.github.adainish.clandorus.listener.MailBuilderDialogueInputListener;
-import io.github.adainish.clandorus.listener.RewardBuilderDialogueInputListener;
-import io.github.adainish.clandorus.listener.PlayerListener;
+import io.github.adainish.clandorus.listener.*;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.registry.ClanGymRegistry;
@@ -132,6 +130,7 @@ public class Clandorus {
         initListeners();
         initTasks();
         loadRewardRegistry();
+        loadClanGymRegistry();
     }
 
 
@@ -222,8 +221,10 @@ public class Clandorus {
 
     public void initListeners() {
         MinecraftForge.EVENT_BUS.register(new PlayerListener());
+        MinecraftForge.EVENT_BUS.register(new ItemInteractListener());
         Pixelmon.EVENT_BUS.register(new RewardBuilderDialogueInputListener());
         Pixelmon.EVENT_BUS.register(new MailBuilderDialogueInputListener());
+        Pixelmon.EVENT_BUS.register(new GymBuilderDialogueInputListener());
 //        Pixelmon.EVENT_BUS.register(new BattleListener());
     }
 

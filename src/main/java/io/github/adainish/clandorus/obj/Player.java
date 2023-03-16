@@ -1,6 +1,10 @@
 package io.github.adainish.clandorus.obj;
 
+import com.pixelmonmod.pixelmon.api.storage.PCStorage;
+import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
+import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.GymBuilder;
 import io.github.adainish.clandorus.api.MailBuilder;
 import io.github.adainish.clandorus.api.RewardBuilder;
 import io.github.adainish.clandorus.obj.clan.Clan;
@@ -19,6 +23,8 @@ public class Player {
     private UUID clanID;
 
     private MailBox mailBox;
+
+    private transient GymBuilder gymBuilder;
 
     private transient RewardBuilder rewardBuilder;
 
@@ -85,6 +91,17 @@ public class Player {
         return clan.getClanMembers().contains(uuid);
     }
 
+
+    public PCStorage getPixelmonComputerStorage()
+    {
+        return StorageProxy.getPCForPlayer(uuid);
+    }
+
+    public PlayerPartyStorage getPixelmonPartyStorage()
+    {
+        return StorageProxy.getParty(uuid);
+    }
+
     public ServerPlayerEntity getServerEntity()
     {
         return Util.getPlayer(uuid);
@@ -122,5 +139,13 @@ public class Player {
 
     public void setMailBuilder(MailBuilder mailBuilder) {
         this.mailBuilder = mailBuilder;
+    }
+
+    public GymBuilder getGymBuilder() {
+        return gymBuilder;
+    }
+
+    public void setGymBuilder(GymBuilder gymBuilder) {
+        this.gymBuilder = gymBuilder;
     }
 }

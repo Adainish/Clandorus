@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Level;
 public class PermissionWrapper {
     public static String clanChatPermission = "clandorus.clanchat.base";
     public static String adminPermission = "clandorus.admin.base";
+    public static String editorPermission = "clandorus.staff.gymeditor";
 
     public static String addRewardToMailPermission = "clandorus.admin.mail.rewards.base";
     public PermissionWrapper() {
@@ -17,6 +18,7 @@ public class PermissionWrapper {
         registerCommandPermission(clanChatPermission, "The clan chat base permission players need to use it");
         registerCommandPermission(adminPermission, "The clan admin permission");
         registerCommandPermission(addRewardToMailPermission);
+        registerCommandPermission(editorPermission);
     }
     public static void registerCommandPermission(String s) {
         if (s == null || s.isEmpty()) {

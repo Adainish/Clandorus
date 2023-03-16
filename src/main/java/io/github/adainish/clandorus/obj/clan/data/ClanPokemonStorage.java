@@ -35,6 +35,21 @@ public class ClanPokemonStorage {
         this.maxPokemon -= amount;
     }
 
+    public int encumberAmount()
+    {
+        return pokemonList.size() - maxPokemon;
+    }
+
+    public boolean isEncumbered()
+    {
+        return maxPokemon < pokemonList.size();
+    }
+
+    public void forceAddToStorage(Pokemon storageItem)
+    {
+        pokemonList.add(storageItem);
+    }
+
     public void addToStorage(Pokemon storageItem)
     {
         if (pokemonList.size() >= maxPokemon)

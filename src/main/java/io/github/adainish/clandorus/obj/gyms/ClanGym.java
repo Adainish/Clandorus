@@ -11,10 +11,7 @@ import com.pixelmonmod.pixelmon.battles.api.rules.clauses.BattleClause;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
-import io.github.adainish.clandorus.obj.HoldRequirements;
-import io.github.adainish.clandorus.obj.Location;
-import io.github.adainish.clandorus.obj.OccupyingHolder;
-import io.github.adainish.clandorus.obj.Player;
+import io.github.adainish.clandorus.obj.*;
 import io.github.adainish.clandorus.storage.PlayerStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -27,37 +24,48 @@ import java.util.List;
 import java.util.UUID;
 
 public class ClanGym {
-    public String identifier;
-    public UUID activeHoldingPlayer;
+    private String identifier;
+    private UUID activeHoldingPlayer;
 
-    public BattleRules battleRules;
+    private BattleRules battleRules;
 
-    public List<BattleClause> battleClauses = new ArrayList<>();
+    private List<BattleClause> battleClauses = new ArrayList<>();
 
-    public List<String> battleProperties = new ArrayList<>();
+    private List<String> battleProperties = new ArrayList<>();
 
-    public long lastChallenged;
+    private long lastChallenged;
 
-    public HoldRequirements holdRequirements;
+    private HoldRequirements holdRequirements;
 
-    public OccupyingHolder occupyingHolder;
+    private OccupyingHolder occupyingHolder;
 
-    public Location location;
+    private Location location;
 
-    public List<Pokemon> activePokemon = new ArrayList<>();
+    private List<Pokemon> activePokemon = new ArrayList<>();
 
-    public List<GymWinActions> selectedWinActions = new ArrayList<>();
+    private List<GymWinActions> selectedWinActions = new ArrayList<>();
+
+    private int gymEntityID = -1;
+
+    private String defaultTeamID = "";
+
+    private GymWinAction winAction;
 
     public ClanGym()
     {
-
-        location = new Location();
+        setOccupyingHolder(null);
+        setHoldRequirements(new HoldRequirements());
+        setWinAction(new GymWinAction());
+        setLocation(new Location());
     }
 
     public ClanGym(String identifier)
     {
-        this.identifier = identifier;
-        location = new Location();
+        this.setIdentifier(identifier);
+        setOccupyingHolder(null);
+        setHoldRequirements(new HoldRequirements());
+        setWinAction(new GymWinAction());
+        setLocation(new Location());
     }
 
 
@@ -68,13 +76,21 @@ public class ClanGym {
 
     }
 
+    public String getHoldingPlayerName()
+    {
+        Player holding = getHoldingPlayer();
+        if (holding == null)
+            return "No holder found";
+        return holding.getName();
+    }
+
     @Nullable
     public Player getHoldingPlayer()
     {
-        if (activeHoldingPlayer == null)
+        if (getActiveHoldingPlayer() == null)
             return null;
 
-        return PlayerStorage.getPlayer(activeHoldingPlayer);
+        return PlayerStorage.getPlayer(getActiveHoldingPlayer());
     }
 
     public boolean isClanGymNPC(Entity entity)
@@ -92,7 +108,7 @@ public class ClanGym {
     {
         NPCTrainer trainer = getClanGymNPC();
         if (trainer == null) {
-            Clandorus.log.warn("Clan Gym NPC for %clangym% did not exist, creating new one".replace("%clangym%", identifier));
+            Clandorus.log.warn("Clan Gym NPC for %clangym% did not exist, creating new one".replace("%clangym%", getIdentifier()));
             createNewClanGymNPC();
         }
     }
@@ -107,16 +123,16 @@ public class ClanGym {
     }
 
     public void loadBattleRules() {
-        battleRules = new BattleRules(BattleType.SINGLE);
-        battleRules.setNewClauses(battleClauses);
+        setBattleRules(new BattleRules(BattleType.SINGLE));
+        getBattleRules().setNewClauses(getBattleClauses());
         initialiseBattleProperties();
     }
 
     public void initialiseBattleProperties()
     {
-        for (String btp:battleProperties) {
+        for (String btp: getBattleProperties()) {
             BattleProperty battleProperty = BattleRuleRegistry.getProperty(btp);
-            battleRules.set(battleProperty, "");
+            getBattleRules().set(battleProperty, "");
         }
     }
 
@@ -127,18 +143,18 @@ public class ClanGym {
 
     public World getWorld()
     {
-        return location.getWorld();
+        return getLocation().getWorld();
     }
 
     public NPCTrainer createNewClanGymNPC()
     {
         NPCTrainer npcTrainer = new NPCTrainer(getWorld());
         npcTrainer.getPersistentData().putBoolean("clandorusGym", true);
-        npcTrainer.getPersistentData().putString("clandorusGymID", identifier);
+        npcTrainer.getPersistentData().putString("clandorusGymID", getIdentifier());
         for (int i = 0; i < 6; i++) {
             npcTrainer.getPokemonStorage().set(i, null);
         }
-        if (activePokemon.isEmpty())
+        if (getActivePokemon().isEmpty())
         {
             for (int i = 0; i < 6; i++) {
                 Pokemon newPokemon = PokemonFactory.create(PixelmonSpecies.getRandomSpecies());
@@ -146,10 +162,10 @@ public class ClanGym {
             }
         } else
         {
-            for (int i = 0; i < activePokemon.size(); i++) {
+            for (int i = 0; i < getActivePokemon().size(); i++) {
                 if (i >= 6)
                     break;
-                Pokemon p = activePokemon.get(i);
+                Pokemon p = getActivePokemon().get(i);
                 if (p == null)
                     continue;
                 npcTrainer.getPokemonStorage().set(i, p);
@@ -168,12 +184,12 @@ public class ClanGym {
             List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, isWithinAABB);
             for (Entity e:entities) {
                 if (isClanGymNPC(e)) {
-                    if (e.getPersistentData().getString("clandorusGymID").equals(identifier)) {
-                        Clandorus.log.log(Level.WARN, "Detected existing clandorus gym npc " + identifier + " loading to cache, no new one has to be created");
+                    if (e.getPersistentData().getString("clandorusGymID").equals(getIdentifier())) {
+                        Clandorus.log.log(Level.WARN, "Detected existing clandorus gym npc " + getIdentifier() + " loading to cache, no new one has to be created");
                         NPCTrainer trainer = (NPCTrainer) e;
                         if (trainer.getPosX() != storedLocation.getPosX() || trainer.getPosY() != storedLocation.getPosY() || trainer.getPosZ() != storedLocation.getPosZ())
                         {
-                            trainer.setPositionAndUpdate(location.getPosX(), location.getPosY(), location.getPosZ());
+                            trainer.setPositionAndUpdate(getLocation().getPosX(), getLocation().getPosY(), getLocation().getPosZ());
                         }
                         return trainer;
                     }
@@ -193,12 +209,12 @@ public class ClanGym {
             List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, isWithinAABB);
             for (Entity e:entities) {
                 if (isClanGymNPC(e)) {
-                    if (e.getPersistentData().getString("clandorusGymID").equals(identifier)) {
-                        Clandorus.log.log(Level.WARN, "Detected existing clandorys gym npc " + identifier + " loading to cache, no new one has to be created");
+                    if (e.getPersistentData().getString("clandorusGymID").equals(getIdentifier())) {
+                        Clandorus.log.log(Level.WARN, "Detected existing clandorys gym npc " + getIdentifier() + " loading to cache, no new one has to be created");
                         NPCTrainer trainer = (NPCTrainer) e;
                         if (trainer.getPosX() != storedLocation.getPosX() || trainer.getPosY() != storedLocation.getPosY() || trainer.getPosZ() != storedLocation.getPosZ())
                         {
-                            trainer.setPositionAndUpdate(location.getPosX(), location.getPosY(), location.getPosZ());
+                            trainer.setPositionAndUpdate(getLocation().getPosX(), getLocation().getPosY(), getLocation().getPosZ());
                         }
                         return trainer;
                     }
@@ -208,11 +224,11 @@ public class ClanGym {
         {
             NPCTrainer npcTrainer = new NPCTrainer(getWorld());
             npcTrainer.getPersistentData().putBoolean("clandorusGym", true);
-            npcTrainer.getPersistentData().putString("clandorusGymID", identifier);
+            npcTrainer.getPersistentData().putString("clandorusGymID", getIdentifier());
             for (int i = 0; i < 6; i++) {
                 npcTrainer.getPokemonStorage().set(i, null);
             }
-            if (activePokemon.isEmpty())
+            if (getActivePokemon().isEmpty())
             {
                 for (int i = 0; i < 6; i++) {
                     Pokemon newPokemon = PokemonFactory.create(PixelmonSpecies.getRandomSpecies());
@@ -220,10 +236,10 @@ public class ClanGym {
                 }
             } else
             {
-                for (int i = 0; i < activePokemon.size(); i++) {
+                for (int i = 0; i < getActivePokemon().size(); i++) {
                     if (i >= 6)
                         break;
-                    Pokemon p = activePokemon.get(i);
+                    Pokemon p = getActivePokemon().get(i);
                     if (p == null)
                         continue;
                     npcTrainer.getPokemonStorage().set(i, p);
@@ -232,6 +248,116 @@ public class ClanGym {
             return npcTrainer;
         }
       return null;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public UUID getActiveHoldingPlayer() {
+        return activeHoldingPlayer;
+    }
+
+    public void setActiveHoldingPlayer(UUID activeHoldingPlayer) {
+        this.activeHoldingPlayer = activeHoldingPlayer;
+    }
+
+    public BattleRules getBattleRules() {
+        return battleRules;
+    }
+
+    public void setBattleRules(BattleRules battleRules) {
+        this.battleRules = battleRules;
+    }
+
+    public List <BattleClause> getBattleClauses() {
+        return battleClauses;
+    }
+
+    public void setBattleClauses(List <BattleClause> battleClauses) {
+        this.battleClauses = battleClauses;
+    }
+
+    public List <String> getBattleProperties() {
+        return battleProperties;
+    }
+
+    public void setBattleProperties(List <String> battleProperties) {
+        this.battleProperties = battleProperties;
+    }
+
+    public long getLastChallenged() {
+        return lastChallenged;
+    }
+
+    public void setLastChallenged(long lastChallenged) {
+        this.lastChallenged = lastChallenged;
+    }
+
+    public HoldRequirements getHoldRequirements() {
+        return holdRequirements;
+    }
+
+    public void setHoldRequirements(HoldRequirements holdRequirements) {
+        this.holdRequirements = holdRequirements;
+    }
+
+    public OccupyingHolder getOccupyingHolder() {
+        return occupyingHolder;
+    }
+
+    public void setOccupyingHolder(OccupyingHolder occupyingHolder) {
+        this.occupyingHolder = occupyingHolder;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public List <Pokemon> getActivePokemon() {
+        return activePokemon;
+    }
+
+    public void setActivePokemon(List <Pokemon> activePokemon) {
+        this.activePokemon = activePokemon;
+    }
+
+    public List <GymWinActions> getSelectedWinActions() {
+        return selectedWinActions;
+    }
+
+    public void setSelectedWinActions(List <GymWinActions> selectedWinActions) {
+        this.selectedWinActions = selectedWinActions;
+    }
+
+    public int getGymEntityID() {
+        return gymEntityID;
+    }
+
+    public void setGymEntityID(int gymEntityID) {
+        this.gymEntityID = gymEntityID;
+    }
+
+    public String getDefaultTeamID() {
+        if (defaultTeamID.isEmpty())
+            return "Undefined";
+        return defaultTeamID;
+    }
+
+    public void setDefaultTeamID(String defaultTeamID) {
+        this.defaultTeamID = defaultTeamID;
+    }
+
+    public GymWinAction getWinAction() {
+        return winAction;
+    }
+
+    public void setWinAction(GymWinAction winAction) {
+        this.winAction = winAction;
     }
 
 

@@ -10,6 +10,7 @@ import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.api.MailBuilder;
 import io.github.adainish.clandorus.api.RewardBuilder;
 import io.github.adainish.clandorus.conf.LanguageConfig;
+import io.github.adainish.clandorus.items.GymEditorItem;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.obj.clan.Invite;
@@ -437,6 +438,18 @@ public class ClanCommand {
                                     return 1;
                                 })
                         )
+                )
+                .then(Commands.literal("gymeditor")
+                        .executes(cc -> {
+                            try {
+                                GymEditorItem gymEditorItem = new GymEditorItem();
+                                cc.getSource().asPlayer().inventory.addItemStackToInventory(gymEditorItem.getEditorStack());
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                            return 1;
+                        })
                 )
                 .then(Commands.literal("pokemonstorage")
                         .executes(cc -> {

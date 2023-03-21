@@ -18,9 +18,9 @@ import com.pixelmonmod.pixelmon.api.util.Scheduling;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import io.github.adainish.clandorus.enumeration.GymBuilderAction;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
-import io.github.adainish.clandorus.obj.GymWinAction;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.gyms.ClanGym;
+import io.github.adainish.clandorus.obj.mail.Reward;
 import io.github.adainish.clandorus.util.Util;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -74,6 +74,24 @@ public class GymBuilder
                 builder.setText(Util.formattedString("&7Type the name you want to give this Gym"));
                 break;
             }
+            case money_given:
+            {
+                builder.setTitle(Util.formattedString("&bSet Money"));
+                builder.setText(Util.formattedString("&7Provide the amount of money that should be given"));
+                break;
+            }
+            case hand_out_pokemon:
+            {
+                builder.setTitle(Util.formattedString("&b&lPokemon Spec"));
+                builder.setText(Util.formattedString("&7&lProvide the Spec you want this Pokemon to have"));
+                break;
+            }
+            case money_given_error:
+            {
+                builder.setTitle(Util.formattedString("&cInvalid integer"));
+                builder.setText(Util.formattedString("&4Please provide a valid number!"));
+                break;
+            }
             case none: {
                 break;
             }
@@ -94,10 +112,17 @@ public class GymBuilder
         }
     }
 
-    public List <Button> gymActionList(Player player, NPCTrainer trainer, ClanGym gym)
+    public List <Button> enabledRewardsButtons(Player player, NPCTrainer trainer, ClanGym gym)
     {
         List<Button> buttons = new ArrayList <>();
-
+        for (Reward r:gym.getWinAction().returnRewardsFromIDs()) {
+            GooeyButton button = GooeyButton.builder()
+                    .title(Util.formattedString(r.getDisplayTitle()))
+                    .lore(Util.formattedArrayList(r.getDisplayLore()))
+                    .display(r.getDisplayItem())
+                    .build();
+            buttons.add(button);
+        }
         return buttons;
     }
 
@@ -110,7 +135,7 @@ public class GymBuilder
                 .line(LineType.HORIZONTAL, 1, 1, 7, placeHolderButton)
                 .build();
 
-        return PaginationHelper.createPagesFromPlaceholders(template, gymActionList(player, trainer, gym), LinkedPage.builder().title(Util.formattedString("")).template(template));
+        return PaginationHelper.createPagesFromPlaceholders(template, enabledRewardsButtons(player, trainer, gym), LinkedPage.builder().title(Util.formattedString("&bGym Rewards")).template(template));
     }
 
     public List<String> getCurrentPokemonLore(NPCTrainer trainer)
@@ -168,9 +193,38 @@ public class GymBuilder
 
         int i = 0;
         for (GymWinActions action: GymWinActions.values()) {
+            List<String> lore = new ArrayList<>();
+            switch (action)
+            {
+                case Reward:
+                {
+                    lore.add("&aClick to view and modify what rewards are available");
+                    break;
+                }
+                case Give_Money:
+                {
+                    lore.add("&aClick to set the amount of money given upon taking a clan gym");
+                    lore.add("&7The current amount is: %amount%$".replace("%amount%", String.valueOf(gym.getWinAction().money)));
+                    break;
+                }
+                case Give_Pokemon:
+                {
+                    lore.add("&aClick to modify what Pokemon should be given upon beating a gym");
+                    break;
+                }
+                case Take_Pokemon:
+                {
+                    lore.add("&aClick to set whether a pokemon can be stolen from an npc upon beating a gym");
+                    lore.add("&aResulting in them being stolen from the defeated clan");
+                    String enabled = gym.getWinAction().takePokemon ? "&a&lEnabled" : "&c&ldisabled";
+                    lore.add("&7This option is %status%".replace("%status%", enabled));
+                    break;
+                }
+            }
             GooeyButton button = GooeyButton.builder()
                     .title(Util.formattedString("&b%action%".replace("%action%", action.name().replaceAll("_", " "))))
                     .display(getActionStack(action))
+                    .lore(Util.formattedArrayList(lore))
                     .onClick(b -> {
                         switch (action)
                         {
@@ -181,16 +235,20 @@ public class GymBuilder
                             }
                             case Give_Money:
                             {
-
+                                dialogueInputScreenBuilder(GymBuilderAction.money_given, player).sendTo(player.getServerEntity());
                                 break;
                             }
                             case Take_Pokemon:
                             {
-                                //switch bool
+
+                                gym.getWinAction().updateTakeStatus();
+                                //update gym cache? need to decide on a "finish" option
+                                UIManager.openUIForcefully(b.getPlayer(), EditActionPage(player, gym, trainer));
                                 break;
                             }
                             case Give_Pokemon:
                             {
+                               //open menu where current pokemon can be reviewed / added / removed
                                 // create args to give through specs
                                 break;
                             }
@@ -270,12 +328,9 @@ public class GymBuilder
                 .display(new ItemStack(Items.GREEN_DYE))
                 .title(Util.formattedString("&aMake Clan Gym"))
                 .onClick(b -> {
-                    player.setGymBuilder(this);
-                    //open string provider
                     UIManager.closeUI(b.getPlayer());
+                    player.setGymBuilder(this);
                     Scheduling.schedule(2, scheduledTask -> dialogueInputScreenBuilder(GymBuilderAction.title, player).sendTo(b.getPlayer()), false);
-                        // ClanGym gym = new ClanGym();
-                              //open editor menu after string defined
                 })
                 .build();
 

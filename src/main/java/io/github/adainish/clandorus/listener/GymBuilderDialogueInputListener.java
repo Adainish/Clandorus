@@ -18,12 +18,53 @@ public class GymBuilderDialogueInputListener
         {
             if (player.getGymBuilder() != null)
             {
-                if (player.getGymBuilder().getGymBuilderAction() != null && player.getGymBuilder().getGymBuilderAction() == GymBuilderAction.title) {
+                if (player.getGymBuilder().getGymBuilderAction() != null)
+                {
                     ClanGym gym = new ClanGym();
-                    gym.setIdentifier(event.getInput());
+                    if (player.getGymBuilder().getGym() != null)
+                        gym = player.getGymBuilder().getGym();
+                    ClanGym finalGym = gym;
+                    switch (player.getGymBuilder().getGymBuilderAction())
+                    {
+                        case title: {
+                            finalGym.setIdentifier(event.getInput());
+                            player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
+                            break;
+                        }
+                        case money_given_error:
+                        case money_given: {
+                            int am = 0;
+                            try {
+                                am = Integer.parseInt(event.getInput());
+                            } catch (NumberFormatException e)
+                            {
+                                player.getGymBuilder().setGymBuilderAction(GymBuilderAction.money_given_error);
+                                player.getGymBuilder().dialogueInputScreenBuilder(GymBuilderAction.money_given_error, player).sendTo(player.getServerEntity());
+                                return;
+                            }
+                            int finalAm = am;
+                            player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
+                            finalGym.getWinAction().money = finalAm;
+                            break;
+                        }
+                        case hand_out_pokemon:
+                        {
+                            player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
+                            //transform to be different
+                            player.getGymBuilder().getGym().getWinAction().givePokemon.add(event.getInput());
+                            break;
+                        }
+                        case none:
+                        {
+                            break;
+                        }
+                        default:
+                            return;
+                    }
+
                     Scheduling.schedule(2, () -> {
-                        player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
-                        player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), gym);
+                        player.getGymBuilder().setGym(finalGym);
+                        player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
                     }, false);
                 }
             }

@@ -15,6 +15,7 @@ import io.github.adainish.clandorus.util.Util;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import org.apache.logging.log4j.Level;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class Player {
@@ -88,18 +89,18 @@ public class Player {
             return false;
 
         }
-        return clan.getClanMembers().contains(uuid);
+        return clan.getClanMembers().contains(this.uuid);
     }
 
 
     public PCStorage getPixelmonComputerStorage()
     {
-        return StorageProxy.getPCForPlayer(uuid);
+        return StorageProxy.getPCForPlayer(this.uuid);
     }
 
     public PlayerPartyStorage getPixelmonPartyStorage()
     {
-        return StorageProxy.getParty(uuid);
+        return StorageProxy.getParty(this.uuid);
     }
 
     public ServerPlayerEntity getServerEntity()
@@ -108,9 +109,7 @@ public class Player {
     }
 
     public void updateCache() {
-        if (Clandorus.clanWrapper.playerCache.containsKey(this.getUuid()))
-            Clandorus.clanWrapper.playerCache.replace(this.getUuid(), this);
-        else Clandorus.clanWrapper.playerCache.put(this.getUuid(), this);
+        Clandorus.clanWrapper.playerCache.put(this.getUuid(), this);
     }
 
     public void savePlayer() {
@@ -147,5 +146,16 @@ public class Player {
 
     public void setGymBuilder(GymBuilder gymBuilder) {
         this.gymBuilder = gymBuilder;
+    }
+
+    public Optional<Clan> getClanOptional()
+    {
+        if (clanID != null) {
+            Clan clan = ClanStorage.getClan(clanID);
+            if (clan != null)
+                return Optional.of(clan);
+            else return Optional.empty();
+        }
+        return Optional.empty();
     }
 }

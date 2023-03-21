@@ -1,4 +1,4 @@
-package io.github.adainish.clandorus.obj;
+package io.github.adainish.clandorus.obj.gyms;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;

@@ -15,6 +15,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.item.pokeball.PokeBallRegistry;
 import com.pixelmonmod.pixelmon.api.registries.PixelmonItems;
 import com.pixelmonmod.pixelmon.api.util.Scheduling;
+import com.pixelmonmod.pixelmon.api.util.helpers.SpriteItemHelper;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import io.github.adainish.clandorus.enumeration.GymBuilderAction;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.github.adainish.clandorus.util.Util.filler;
@@ -74,6 +76,12 @@ public class GymBuilder
                 builder.setText(Util.formattedString("&7Type the name you want to give this Gym"));
                 break;
             }
+            case title_error:
+            {
+                builder.setTitle(Util.formattedString("&4&lInvalid Name"));
+                builder.setText(Util.formattedString("&cPlease provide a valid name!"));
+                break;
+            }
             case money_given:
             {
                 builder.setTitle(Util.formattedString("&bSet Money"));
@@ -84,6 +92,12 @@ public class GymBuilder
             {
                 builder.setTitle(Util.formattedString("&b&lPokemon Spec"));
                 builder.setText(Util.formattedString("&7&lProvide the Spec you want this Pokemon to have"));
+                break;
+            }
+            case hand_out_pokemon_error:
+            {
+                builder.setTitle(Util.formattedString("&4&lInvalid Spec"));
+                builder.setText(Util.formattedString("&cPlease provide a valid Pokemon Spec"));
                 break;
             }
             case money_given_error:
@@ -104,12 +118,7 @@ public class GymBuilder
     public void openEditorUI(Player player, NPCTrainer trainer, ClanGym gym)
     {
         player.setGymBuilder(this);
-        if (gym != null)
-        {
-            UIManager.openUIForcefully(Util.getPlayer(player.getUuid()), EditGymPage(player, gym, trainer));
-        } else {
-            UIManager.openUIForcefully(Util.getPlayer(player.getUuid()), CreateGymPage(player, trainer));
-        }
+        UIManager.openUIForcefully(Util.getPlayer(player.getUuid()), gym != null ? EditGymPage(player, gym, trainer) : CreateGymPage(player, trainer));
     }
 
     public List <Button> enabledRewardsButtons(Player player, NPCTrainer trainer, ClanGym gym)
@@ -187,6 +196,76 @@ public class GymBuilder
         return new ItemStack(item);
     }
 
+    public List<Button> pokemonSpecButtonList(Player player, ClanGym gym, NPCTrainer trainer)
+    {
+        List<Button> buttons = new ArrayList <>();
+
+        for (String s:gym.getWinAction().pokemonSpecList) {
+            Pokemon p = gym.getWinAction().pokemonFromString(s);
+            if (p != null)
+            {
+                GooeyButton button = GooeyButton.builder()
+                        .title(Util.formattedString("&bPokemon Spec:"))
+                        .lore(Util.formattedArrayList(Arrays.asList("&7" + s, "&4&lClick to remove")))
+                        .display(SpriteItemHelper.getPhoto(p))
+                        .onClick(b -> {
+                            gym.getWinAction().pokemonSpecList.remove(s);
+                            UIManager.openUIForcefully(b.getPlayer(), ManageSpecPage(player, gym, trainer));
+                        })
+                        .build();
+                buttons.add(button);
+            }
+        }
+
+        return buttons;
+    }
+
+
+    public LinkedPage ManageSpecPage(Player player, ClanGym gym, NPCTrainer trainer)
+    {
+        PlaceholderButton placeHolderButton = new PlaceholderButton();
+        Template template = null;
+        //back button
+        template = ChestTemplate.builder(5)
+                .border(0, 0, 5, 9, filler)
+                .line(LineType.HORIZONTAL, 1, 1, 7, placeHolderButton)
+                .build();
+
+        return PaginationHelper.createPagesFromPlaceholders(template, pokemonSpecButtonList(player, gym, trainer), LinkedPage.builder().title(Util.formattedString("&bGym Rewards")).template(template));
+    }
+
+    public GooeyPage ManagePokemonPage(Player player, ClanGym gym, NPCTrainer trainer)
+    {
+
+        ChestTemplate.Builder builder = ChestTemplate.builder(6);
+
+        builder.border(0, 0, 6, 9, filler);
+
+        GooeyButton addSpec = GooeyButton.builder()
+                .display(new ItemStack(Items.WRITABLE_BOOK))
+                .title(Util.formattedString("&aAdd Spec"))
+                .lore(Util.formattedArrayList(Arrays.asList("&7Click to add a pokemon spec to give out to players")))
+                .onClick(b -> {
+                    dialogueInputScreenBuilder(GymBuilderAction.hand_out_pokemon, player).sendTo(b.getPlayer());
+                })
+                .build();
+
+        GooeyButton viewAndDeleteSpecs = GooeyButton.builder()
+                .title(Util.formattedString("&cManage Specs"))
+                .lore(Util.formattedArrayList(Arrays.asList("&7Click to view and remove configured pokemon specs", "&7Clicking on a spec will delete it")))
+                .display(new ItemStack(Items.WRITTEN_BOOK))
+                .onClick(b -> {
+                    UIManager.openUIForcefully(b.getPlayer(), ManageSpecPage(player, gym, trainer));
+                })
+                .build();
+
+        builder.set(2, 3, viewAndDeleteSpecs);
+
+        builder.set(2, 5, addSpec);
+
+        return GooeyPage.builder().template(builder.build()).build();
+    }
+
     public GooeyPage EditActionPage(Player player, ClanGym gym, NPCTrainer trainer)
     {
         ChestTemplate.Builder builder = ChestTemplate.builder(6);
@@ -249,6 +328,7 @@ public class GymBuilder
                             case Give_Pokemon:
                             {
                                //open menu where current pokemon can be reviewed / added / removed
+                                UIManager.openUIForcefully(b.getPlayer(), ManagePokemonPage(player, gym, trainer));
                                 // create args to give through specs
                                 break;
                             }
@@ -306,6 +386,9 @@ public class GymBuilder
         GooeyButton holdRequirements = GooeyButton.builder()
                 .title(Util.formattedString("&6Gym Rules and Requirements"))
                 .display(new ItemStack(PixelmonItems.pokemon_editor))
+                .onClick(b -> {
+                    //go to holding requirement manager
+                })
                 .build();
 
 

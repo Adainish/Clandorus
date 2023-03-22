@@ -20,7 +20,7 @@ public class GymWinAction
 {
     public List <String> rewardIDs = new ArrayList <>();
     public boolean takePokemon = false;
-    public List<String> givePokemon = new ArrayList <>();
+    public List<String> pokemonSpecList = new ArrayList <>();
     public int money = 0;
 
     public GymWinAction()
@@ -44,6 +44,13 @@ public class GymWinAction
     }
 
 
+    public Pokemon pokemonFromString(String s)
+    {
+        PokemonSpecification spec = PokemonSpecificationProxy.create(s);
+        return PokemonFactory.create(spec);
+    }
+
+
     public void executeWinAction(Clan clan, Player player, List<Pokemon> pokemonList, UUID previousHolder) {
         Player oldHolder = PlayerStorage.getPlayer(previousHolder);
         PlayerPartyStorage pps = player.getPixelmonPartyStorage();
@@ -57,7 +64,7 @@ public class GymWinAction
         if (this.takePokemon) {
             //open take menu and return pokemon that was stolen
         }
-        if (!this.givePokemon.isEmpty()) {
+        if (!this.pokemonSpecList.isEmpty()) {
             handOutRewardPokemon(pps);
         }
         if (!rewardList.isEmpty()) {
@@ -88,10 +95,20 @@ public class GymWinAction
         }
     }
 
-    public void handOutRewardPokemon(PlayerPartyStorage pps) {
-        for (String s : givePokemon) {
+    public List<Pokemon> specParsedPokemonList()
+    {
+        List<Pokemon> pokemonList = new ArrayList <>();
+        for (String s: pokemonSpecList) {
             PokemonSpecification pokemonSpecification = PokemonSpecificationProxy.create(s);
             Pokemon p = PokemonFactory.create(pokemonSpecification);
+            if (p != null)
+                pokemonList.add(p);
+        }
+        return pokemonList;
+    }
+
+    public void handOutRewardPokemon(PlayerPartyStorage pps) {
+        for (Pokemon p:specParsedPokemonList()) {
             if (p != null)
                 pps.add(p);
         }

@@ -15,7 +15,7 @@ public class Location {
 
     }
 
-    public BlockPos returnBlockpos()
+    public BlockPos returnBlockPos()
     {
         return new BlockPos(getPosX(), getPosY(), getPosZ());
     }

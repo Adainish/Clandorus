@@ -92,6 +92,11 @@ public class Player {
         return clan.getClanMembers().contains(this.uuid);
     }
 
+    public boolean isOnline()
+    {
+        return Util.isPlayerOnline(uuid);
+    }
+
 
     public PCStorage getPixelmonComputerStorage()
     {

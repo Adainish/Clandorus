@@ -97,15 +97,18 @@ public class MailBuilder {
     }
 
     public void sendMail() {
-        List<UUID> markedUUIDS = new ArrayList<>();
+        List <UUID> markedUUIDS = new ArrayList <>();
         if (!clanList.isEmpty()) {
             for (UUID uuid : clanList) {
                 Clan clan = ClanStorage.getClan(uuid);
                 if (clan != null) {
                     for (Player p : clan.memberPlayerData()) {
+                        if (p.isOnline())
+                            p.sendMessage("&aYou've received mail!");
                         p.initialiseNull();
                         p.getMailBox().mailList.add(0, mail);
                         p.savePlayer();
+
                         markedUUIDS.add(p.getUuid());
                     }
                 }
@@ -118,6 +121,8 @@ public class MailBuilder {
                 Player p = PlayerStorage.getPlayer(uuid);
                 if (p != null) {
                     p.initialiseNull();
+                    if (p.isOnline())
+                        p.sendMessage("&aYou've received mail!");
                     p.getMailBox().mailList.add(0, mail);
                     p.savePlayer();
                 }

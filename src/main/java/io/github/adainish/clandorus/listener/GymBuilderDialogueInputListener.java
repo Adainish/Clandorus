@@ -32,6 +32,11 @@ public class GymBuilderDialogueInputListener {
                             }
                             finalGym.setIdentifier(event.getInput());
                             player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
+
+                            Scheduling.schedule(2, () -> {
+                                player.getGymBuilder().setGym(finalGym);
+                                player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
+                            }, false);
                             break;
                         }
                         case money_given_error:
@@ -47,6 +52,11 @@ public class GymBuilderDialogueInputListener {
                             int finalAm = am;
                             player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
                             finalGym.getWinAction().money = finalAm;
+
+                            Scheduling.schedule(2, () -> {
+                                player.getGymBuilder().setGym(finalGym);
+                                player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
+                            }, false);
                             break;
                         }
                         case hand_out_pokemon:
@@ -64,7 +74,36 @@ public class GymBuilderDialogueInputListener {
                                 }
                             }
                             player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
-                            player.getGymBuilder().getGym().getWinAction().pokemonSpecList.add(event.getInput());
+                            finalGym.getWinAction().pokemonSpecList.add(event.getInput());
+
+                            Scheduling.schedule(2, () -> {
+                                player.getGymBuilder().setGym(finalGym);
+                                player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
+                            }, false);
+                            break;
+                        }
+
+                        case ban_spec:
+                        case ban_spec_error: {
+                            if (event.getInput().isEmpty()) {
+                                player.getGymBuilder().setGymBuilderAction(GymBuilderAction.ban_spec_error);
+                                player.getGymBuilder().dialogueInputScreenBuilder(GymBuilderAction.ban_spec_error, player).sendTo(player.getServerEntity());
+                                return;
+                            } else {
+                                PokemonSpecification spec = PokemonSpecificationProxy.create(event.getInput());
+                                if (spec.create() == null || spec.create().getSpecies().equals(PixelmonSpecies.MISSINGNO.getValueUnsafe())) {
+                                    player.getGymBuilder().setGymBuilderAction(GymBuilderAction.ban_spec_error);
+                                    player.getGymBuilder().dialogueInputScreenBuilder(GymBuilderAction.ban_spec_error, player).sendTo(player.getServerEntity());
+                                    return;
+                                }
+                            }
+                            player.getGymBuilder().setGymBuilderAction(GymBuilderAction.none);
+                            if (!finalGym.getHoldRequirements().bannedPokemonSpecs.contains(event.getInput()))
+                                finalGym.getHoldRequirements().bannedPokemonSpecs.add(event.getInput());
+                            Scheduling.schedule(2, () -> {
+                                player.getGymBuilder().setGym(finalGym);
+                                player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
+                            }, false);
                             break;
                         }
                         case none: {
@@ -73,11 +112,6 @@ public class GymBuilderDialogueInputListener {
                         default:
                             return;
                     }
-
-                    Scheduling.schedule(2, () -> {
-                        player.getGymBuilder().setGym(finalGym);
-                        player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), finalGym);
-                    }, false);
                 }
             }
         }

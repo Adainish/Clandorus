@@ -6,6 +6,8 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.MailBuilder;
+import io.github.adainish.clandorus.enumeration.MailSender;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.obj.mail.Reward;
@@ -68,29 +70,31 @@ public class GymWinAction
             handOutRewardPokemon(pps);
         }
         if (!rewardList.isEmpty()) {
-            for (Reward r : rewardList) {
-                r.handOutRewards(player);
-            }
+            MailBuilder mailBuilder = new MailBuilder();
+            mailBuilder.getMail().getRewardList().addAll(rewardList);
+            mailBuilder.getMail().setMessage("&7Rewards for conquering the clan gym.");
+            mailBuilder.getMail().setSender(MailSender.Server);
+            mailBuilder.getMail().setTargetUUID(player.getUuid());
+            mailBuilder.sendMail();
         }
 
         if (this.money > 0)
             EconomyUtil.giveBalance(player.getUuid(), money);
 
         if (!pokemonList.isEmpty()) {
-            for (Pokemon p : pokemonList) {
-                if (oldHolderClan != null) {
+            if (oldHolderClan != null) {
+                for (Pokemon p : pokemonList) {
                     if (p != null) {
                         oldHolderClan.getPokemonStorage().addToStorage(p);
                     }
-
-                    if (oldHolderClan.getPokemonStorage().isEncumbered()) {
-                        oldHolderClan.doTeamBroadcast("&4&lThe Clans Pokemon Storage is currently encumbered, %encumbered%/%maxstorage%"
-                                .replace("%encumbered%", String.valueOf(oldHolderClan.getPokemonStorage().encumberAmount()))
-                                .replace("%maxstorage%", String.valueOf(oldHolderClan.getPokemonStorage().maxPokemon))
-                        );
-                    }
-                    oldHolderClan.save();
                 }
+                if (oldHolderClan.getPokemonStorage().isEncumbered()) {
+                    oldHolderClan.doTeamBroadcast("&4&lThe Clans Pokemon Storage is currently encumbered, %encumbered%/%maxstorage%"
+                            .replace("%encumbered%", String.valueOf(oldHolderClan.getPokemonStorage().encumberAmount()))
+                            .replace("%maxstorage%", String.valueOf(oldHolderClan.getPokemonStorage().maxPokemon))
+                    );
+                }
+                oldHolderClan.save();
             }
         }
     }
@@ -116,8 +120,8 @@ public class GymWinAction
 
     public void updateTakeStatus()
     {
-        if (takePokemon)
-            takePokemon = false;
-        else takePokemon = true;
+        if (this.takePokemon)
+            this.takePokemon = false;
+        else this.takePokemon = true;
     }
 }

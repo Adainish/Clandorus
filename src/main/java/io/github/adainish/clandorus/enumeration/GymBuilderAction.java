@@ -8,5 +8,7 @@ public enum GymBuilderAction
     money_given_error,
     hand_out_pokemon,
     hand_out_pokemon_error,
+    ban_spec,
+    ban_spec_error,
     none
 }

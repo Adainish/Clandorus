@@ -94,6 +94,13 @@ public class RewardBuilder {
         player.getMailBuilder().openMailBuilder(player);
     }
 
+    public void buildAndReturnToGymBuilder(Player player)
+    {
+        Reward buildReward = buildReward();
+        player.getGymBuilder().getGym().getWinAction().rewardIDs.add(buildReward.getIdentifier());
+        player.getGymBuilder().openEditorUI(player, player.getGymBuilder().getNpcTrainer(), player.getGymBuilder().getGym());
+    }
+
     public void openRewardBuilder(Player player)
     {
         ServerPlayerEntity playerEntity = Util.getPlayer(player.getUuid());
@@ -430,7 +437,11 @@ public class RewardBuilder {
                 {
                     if (player.getMailBuilder() != null) {
                         buildAndReturnToMailBuilder(player);
-                    } else {
+                    } else if (player.getGymBuilder() != null)
+                    {
+                        buildAndReturnToGymBuilder(player);
+                    }
+                        else {
                         UIManager.closeUI(b.getPlayer());
                     }
                 })

@@ -1,5 +1,6 @@
 package io.github.adainish.clandorus.obj.gyms;
 
+import com.google.gson.Gson;
 import com.pixelmonmod.pixelmon.api.battles.BattleType;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
@@ -8,34 +9,44 @@ import com.pixelmonmod.pixelmon.battles.api.rules.BattleProperty;
 import com.pixelmonmod.pixelmon.battles.api.rules.BattleRuleRegistry;
 import com.pixelmonmod.pixelmon.battles.api.rules.BattleRules;
 import com.pixelmonmod.pixelmon.battles.api.rules.clauses.BattleClause;
+import com.pixelmonmod.pixelmon.battles.api.rules.clauses.BattleClauseRegistry;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import info.pixelmon.repack.org.spongepowered.serialize.SerializationException;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.conf.ClanGymConfig;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
 import io.github.adainish.clandorus.obj.*;
 import io.github.adainish.clandorus.storage.PlayerStorage;
+import io.github.adainish.clandorus.util.Adapters;
+import io.leangen.geantyref.TypeToken;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ClanGym {
     private String identifier;
     private UUID activeHoldingPlayer;
 
-    private BattleRules battleRules;
+    private transient BattleRules battleRules;
 
-    private List<BattleClause> battleClauses = new ArrayList<>();
+    private transient List<BattleClause> battleClauses = new ArrayList<>();
 
-    private List<String> battleProperties = new ArrayList<>();
+    private transient List<String> battleProperties = new ArrayList<>();
 
     private long lastChallenged;
 
-    private HoldRequirements holdRequirements;
+    private transient HoldRequirements holdRequirements;
 
     private OccupyingHolder occupyingHolder;
 
@@ -50,6 +61,7 @@ public class ClanGym {
     private String defaultTeamID = "";
 
     private GymWinAction winAction;
+
 
     public ClanGym()
     {
@@ -66,6 +78,48 @@ public class ClanGym {
         setHoldRequirements(new HoldRequirements());
         setWinAction(new GymWinAction());
         setLocation(new Location());
+        syncConfig();
+    }
+
+    public void syncConfig() {
+        this.location.setWorldID(ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "Location", "WorldID").getString());
+        this.location.setPosX(ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "Location", "X").getDouble());
+        this.location.setPosY(ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "Location", "Y").getDouble());
+        this.location.setPosZ(ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "Location", "Z").getDouble());
+
+
+        try {
+            List <String> bannedSpecs = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "HoldRequirements", "BannedPokemonSpecs").getList(TypeToken.get(String.class));
+            List <String> bannedAbilities = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "HoldRequirements", "BannedAbilities").getList(TypeToken.get(String.class));
+            List <String> bannedAttacks = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "HoldRequirements", "BannedAttacks").getList(TypeToken.get(String.class));
+
+            List <String> rewardIDS = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "WinAction", "RewardIDs").getList(TypeToken.get(String.class));
+            List <String> pokemonSpecs = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "WinAction", "PokemonSpecs").getList(TypeToken.get(String.class));
+
+
+            List <String> battleClausesList = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "BattleRules").getList(TypeToken.get(String.class));
+
+            if (bannedSpecs != null)
+                this.holdRequirements.bannedPokemonSpecs.addAll(bannedSpecs);
+            if (bannedAbilities != null)
+                this.holdRequirements.bannedAbilities.addAll(bannedAbilities);
+            if (bannedAttacks != null)
+                this.holdRequirements.bannedMoves.addAll(bannedAttacks);
+            if (rewardIDS != null)
+                this.winAction.rewardIDs.addAll(rewardIDS);
+            if (pokemonSpecs != null)
+                this.winAction.pokemonSpecList.addAll(pokemonSpecs);
+            if (battleClausesList != null)
+                battleClausesList.stream().map(BattleClauseRegistry::getClause).filter(Objects::nonNull).forEach(clause -> battleClauses.add(clause));
+
+        } catch (SerializationException e) {
+            Clandorus.log.error(e);
+        }
+
+        this.holdRequirements.min31Ivs = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "HoldRequirements", "MinIVS").getInt();
+        this.winAction.takePokemon = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "WinAction", "TakePokemon").getBoolean();
+        this.winAction.money = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "WinAction", "Money").getInt();
+        this.defaultTeamID =  ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "DefaultTeam").getString();
     }
 
 
@@ -111,6 +165,15 @@ public class ClanGym {
             Clandorus.log.warn("Clan Gym NPC for %clangym% did not exist, creating new one".replace("%clangym%", getIdentifier()));
             createNewClanGymNPC();
         }
+    }
+
+    public void save()
+    {
+        if (!Clandorus.clanGymRegistry.fileInStorage(identifier + ".json"))
+        {
+            Clandorus.clanGymRegistry.makeClanGym(this);
+        }
+        Clandorus.clanGymRegistry.save(this);
     }
 
 
@@ -177,10 +240,10 @@ public class ClanGym {
     public NPCTrainer getClanGymNPC()
     {
         World world = getWorld();
-        if (world.isAreaLoaded(getLocation().returnBlockpos(), 40))
+        if (world.isAreaLoaded(getLocation().returnBlockPos(), 40))
         {
             Location storedLocation = getLocation();
-            AxisAlignedBB isWithinAABB = new AxisAlignedBB(getLocation().returnBlockpos());
+            AxisAlignedBB isWithinAABB = new AxisAlignedBB(getLocation().returnBlockPos());
             List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, isWithinAABB);
             for (Entity e:entities) {
                 if (isClanGymNPC(e)) {
@@ -202,10 +265,10 @@ public class ClanGym {
     public NPCTrainer getOrCreateClanGymNPC()
     {
         World world = getWorld();
-        if (world.isAreaLoaded(getLocation().returnBlockpos(), 40))
+        if (world.isAreaLoaded(getLocation().returnBlockPos(), 40))
         {
             Location storedLocation = getLocation();
-            AxisAlignedBB isWithinAABB = new AxisAlignedBB(getLocation().returnBlockpos());
+            AxisAlignedBB isWithinAABB = new AxisAlignedBB(getLocation().returnBlockPos());
             List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, isWithinAABB);
             for (Entity e:entities) {
                 if (isClanGymNPC(e)) {

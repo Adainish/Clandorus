@@ -5,6 +5,7 @@ import com.pixelmonmod.api.pokemon.PokemonSpecificationProxy;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
+import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.api.MailBuilder;
 import io.github.adainish.clandorus.enumeration.MailSender;
@@ -53,7 +54,9 @@ public class GymWinAction
     }
 
 
-    public void executeWinAction(Clan clan, Player player, List<Pokemon> pokemonList, UUID previousHolder) {
+
+
+    public void executeWinAction(Clan clan, Player player, List<Pokemon> pokemonList, UUID previousHolder, NPCTrainer trainer) {
         Player oldHolder = PlayerStorage.getPlayer(previousHolder);
         PlayerPartyStorage pps = player.getPixelmonPartyStorage();
         Clan oldHolderClan = null;
@@ -64,7 +67,7 @@ public class GymWinAction
         //old clan storage?
         List<Reward> rewardList = new ArrayList<>(returnRewardsFromIDs());
         if (this.takePokemon) {
-            //open take menu and return pokemon that was stolen
+            //open take menu if team isn't a default team and return pokemon that weren't stolen to be sent to storage return
         }
         if (!this.pokemonSpecList.isEmpty()) {
             handOutRewardPokemon(pps);
@@ -75,17 +78,28 @@ public class GymWinAction
             mailBuilder.getMail().setMessage("&7Rewards for conquering the clan gym.");
             mailBuilder.getMail().setSender(MailSender.Server);
             mailBuilder.getMail().setTargetUUID(player.getUuid());
+            mailBuilder.getPlayerList().add(player.getUuid());
             mailBuilder.sendMail();
         }
 
         if (this.money > 0)
             EconomyUtil.giveBalance(player.getUuid(), money);
 
+        for (int i = 0; i < 6; i++) {
+            if (trainer.getPokemonStorage().get(i) != null)
+            {
+                trainer.getPokemonStorage().set(i, null);
+            }
+        }
         if (!pokemonList.isEmpty()) {
             if (oldHolderClan != null) {
                 for (Pokemon p : pokemonList) {
                     if (p != null) {
-                        oldHolderClan.getPokemonStorage().addToStorage(p);
+                        //temp
+                        if (p.isEgg())
+                            continue;
+                        trainer.getPokemonStorage().add(p);
+                        //menu to pick from clan storage and party, then add to NPC team, if pokemon isn't legal or the provided team is empty set default team
                     }
                 }
                 if (oldHolderClan.getPokemonStorage().isEncumbered()) {
@@ -96,7 +110,10 @@ public class GymWinAction
                 }
                 oldHolderClan.save();
             }
+        } else {
+            //set default team to npc
         }
+
     }
 
     public List<Pokemon> specParsedPokemonList()

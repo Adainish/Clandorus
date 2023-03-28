@@ -50,6 +50,11 @@ public class OccupyingHolder {
         //timer handling through config as well as the ability to pull data directly from time calculation.
     }
 
+    public void handoutRewards()
+    {
+
+    }
+
 
     public List<Reward> rewards()
     {

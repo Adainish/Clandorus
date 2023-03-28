@@ -10,11 +10,8 @@ import info.pixelmon.repack.org.spongepowered.ConfigurateException;
 import info.pixelmon.repack.org.spongepowered.serialize.SerializationException;
 import io.github.adainish.clandorus.Clandorus;
 import io.github.adainish.clandorus.conf.ClanGymConfig;
-import io.github.adainish.clandorus.conf.RewardConfig;
 import io.github.adainish.clandorus.obj.gyms.ClanGym;
-import io.github.adainish.clandorus.obj.mail.Reward;
 import io.github.adainish.clandorus.util.Adapters;
-import io.github.adainish.clandorus.util.Util;
 import net.minecraft.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -60,7 +57,7 @@ public class ClanGymRegistry {
                 continue;
 
             ClanGym gym = new ClanGym(identifier);
-
+            makeClanGym(gym);
             clanGymCache.put(identifier, gym);
 
         }
@@ -115,7 +112,7 @@ public class ClanGymRegistry {
                 ClanGym t = gson.fromJson(reader, ClanGym.class);
                 if (t != null) {
                     t.syncConfig();
-                    clanGymCache.put(f.getName(), t);
+                    clanGymCache.put(t.getIdentifier(), t);
                 }
             } catch (FileNotFoundException | JsonSyntaxException e) {
                 Clandorus.log.error(e.getMessage());

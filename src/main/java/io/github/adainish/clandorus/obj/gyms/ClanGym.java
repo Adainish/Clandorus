@@ -56,8 +56,6 @@ public class ClanGym {
 
     private List<GymWinActions> selectedWinActions = new ArrayList<>();
 
-    private int gymEntityID = -1;
-
     private String defaultTeamID = "";
 
     private GymWinAction winAction;
@@ -99,16 +97,41 @@ public class ClanGym {
 
             List <String> battleClausesList = ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "BattleRules").getList(TypeToken.get(String.class));
 
-            if (bannedSpecs != null)
-                this.holdRequirements.bannedPokemonSpecs.addAll(bannedSpecs);
-            if (bannedAbilities != null)
-                this.holdRequirements.bannedAbilities.addAll(bannedAbilities);
-            if (bannedAttacks != null)
-                this.holdRequirements.bannedMoves.addAll(bannedAttacks);
-            if (rewardIDS != null)
-                this.winAction.rewardIDs.addAll(rewardIDS);
-            if (pokemonSpecs != null)
-                this.winAction.pokemonSpecList.addAll(pokemonSpecs);
+            if (bannedSpecs != null) {
+                for (String s : bannedSpecs) {
+                    if (this.holdRequirements.bannedPokemonSpecs.contains(s))
+                        continue;
+                    this.holdRequirements.bannedPokemonSpecs.add(s);
+                }
+            }
+            if (bannedAbilities != null) {
+                for (String s : bannedAbilities) {
+                    if (this.holdRequirements.bannedAbilities.contains(s))
+                        continue;
+                    this.holdRequirements.bannedAbilities.add(s);
+                }
+            }
+            if (bannedAttacks != null) {
+                for (String s : bannedAttacks) {
+                    if (this.holdRequirements.bannedMoves.contains(s))
+                        continue;
+                    this.holdRequirements.bannedMoves.add(s);
+                }
+            }
+            if (rewardIDS != null) {
+                for (String s : rewardIDS) {
+                    if (this.winAction.rewardIDs.contains(s))
+                        continue;
+                    this.winAction.rewardIDs.add(s);
+                }
+            }
+            if (pokemonSpecs != null) {
+                for (String s : pokemonSpecs) {
+                    if (this.winAction.pokemonSpecList.contains(s))
+                        continue;
+                    this.winAction.pokemonSpecList.add(s);
+                }
+            }
             if (battleClausesList != null)
                 battleClausesList.stream().map(BattleClauseRegistry::getClause).filter(Objects::nonNull).forEach(clause -> battleClauses.add(clause));
 
@@ -395,14 +418,6 @@ public class ClanGym {
 
     public void setSelectedWinActions(List <GymWinActions> selectedWinActions) {
         this.selectedWinActions = selectedWinActions;
-    }
-
-    public int getGymEntityID() {
-        return gymEntityID;
-    }
-
-    public void setGymEntityID(int gymEntityID) {
-        this.gymEntityID = gymEntityID;
     }
 
     public String getDefaultTeamID() {

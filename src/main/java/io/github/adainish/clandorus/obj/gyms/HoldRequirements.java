@@ -1,5 +1,6 @@
 package io.github.adainish.clandorus.obj.gyms;
 
+import com.pixelmonmod.api.pokemon.PokemonSpecification;
 import com.pixelmonmod.api.pokemon.PokemonSpecificationProxy;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
@@ -9,6 +10,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.stats.BattleStatsType;
 import com.pixelmonmod.pixelmon.api.pokemon.stats.Moveset;
 import com.pixelmonmod.pixelmon.api.registries.PixelmonSpecies;
 import com.pixelmonmod.pixelmon.battles.attacks.Attack;
+import io.github.adainish.clandorus.Clandorus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,19 +98,24 @@ public class HoldRequirements
 
     public boolean isAbilityBanned(Ability ability)
     {
+        if (bannedAbilities.isEmpty())
+            return false;
         return bannedAbilities.contains(ability.getName());
     }
 
     public boolean isAttackBanned(Attack attack)
     {
+        if (bannedMoves.isEmpty())
+            return false;
         return bannedMoves.contains(attack.getMove().getAttackName());
     }
 
-    public boolean isMoveSetBanned(Moveset moveset)
-    {
-        for (Attack atk:moveset.attacks) {
-            if (isAttackBanned(atk))
-                return true;
+    public boolean isMoveSetBanned(Moveset moveset) {
+        for (Attack atk : moveset.attacks) {
+            if (atk != null) {
+                if (isAttackBanned(atk))
+                    return true;
+            }
         }
         return false;
     }
@@ -118,13 +125,15 @@ public class HoldRequirements
         if (bannedPokemonSpecs.isEmpty())
             return false;
 
-        return bannedPokemonSpecs.stream().map(s -> PokemonSpecificationProxy.create(s).create()).anyMatch(p -> p.getSpecies().equals(pokemon.getSpecies()) && p.getForm().getName().equalsIgnoreCase(pokemon.getForm().getName()));
+        return bannedPokemonSpecs.stream().map(PokemonSpecificationProxy::create).anyMatch(specification -> specification.matches(pokemon));
     }
 
     public boolean isAllowed(Pokemon pokemon)
     {
-        if (isBanned(pokemon))
+        if (isBanned(pokemon)) {
+            Clandorus.log.warn("Spec");
             return false;
+        }
 
 
         int counter = 0;
@@ -133,12 +142,23 @@ public class HoldRequirements
                 counter++;
         }
 
-        if (isAbilityBanned(pokemon.getAbility()))
+        if (isAbilityBanned(pokemon.getAbility())) {
+            Clandorus.log.warn("Ability");
             return false;
+        }
 
-        if (isMoveSetBanned(pokemon.getMoveset()))
+        if (isMoveSetBanned(pokemon.getMoveset())) {
+            Clandorus.log.warn("Move");
             return false;
+        }
 
-        return counter < min31Ivs;
+        if (counter < min31Ivs)
+        {
+            Clandorus.log.warn("IVS");
+            return false;
+        } else {
+
+            return true;
+        }
     }
 }

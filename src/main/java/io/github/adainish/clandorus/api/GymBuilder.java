@@ -1057,7 +1057,6 @@ public class GymBuilder {
         GooeyButton save = GooeyButton.builder()
                 .title(Util.formattedString("&aSave"))
                 .onClick(b -> {
-                    this.gym.setGymEntityID(npcTrainer.getEntityId());
                     npcTrainer.getPersistentData().putBoolean("clandorusGym", true);
                     npcTrainer.getPersistentData().putString("clandorusGymID", gym.getIdentifier());
                     this.gym.save();

@@ -8,6 +8,7 @@ import com.pixelmonmod.pixelmon.enums.technicalmoves.*;
 import io.github.adainish.clandorus.command.ClanChatCommand;
 import io.github.adainish.clandorus.command.ClanCommand;
 import io.github.adainish.clandorus.conf.ClanGymConfig;
+import io.github.adainish.clandorus.conf.DefaultTeamConfig;
 import io.github.adainish.clandorus.conf.LanguageConfig;
 import io.github.adainish.clandorus.conf.RewardConfig;
 import io.github.adainish.clandorus.listener.*;
@@ -15,6 +16,7 @@ import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.clan.Clan;
 import io.github.adainish.clandorus.obj.gyms.ClanGym;
 import io.github.adainish.clandorus.registry.ClanGymRegistry;
+import io.github.adainish.clandorus.registry.DefaultTeamRegistry;
 import io.github.adainish.clandorus.registry.RewardRegistry;
 import io.github.adainish.clandorus.tasks.UpdateClanDataTask;
 import io.github.adainish.clandorus.tasks.UpdateInvitesTask;
@@ -76,6 +78,8 @@ public class Clandorus {
     public static RewardRegistry rewardRegistry;
 
     public static ClanGymRegistry clanGymRegistry;
+
+    public static DefaultTeamRegistry defaultTeamRegistry;
 
     public static List<ITechnicalMove> iTechnicalMoveList = new ArrayList <>();
 
@@ -202,6 +206,7 @@ public class Clandorus {
         LanguageConfig.getConfig().setup();
         RewardConfig.getConfig().setup();
         ClanGymConfig.getConfig().setup();
+        DefaultTeamConfig.getConfig().load();
     }
 
     public void loadConfigs() {
@@ -209,6 +214,7 @@ public class Clandorus {
         LanguageConfig.getConfig().load();
         RewardConfig.getConfig().load();
         ClanGymConfig.getConfig().load();
+        DefaultTeamConfig.getConfig().load();
     }
 
     public void initConfig() {
@@ -225,6 +231,13 @@ public class Clandorus {
     public void loadRewardRegistry()
     {
         rewardRegistry = new RewardRegistry();
+    }
+
+    public void loadDefaultTeamRegistry()
+    {
+        if (defaultTeamRegistry == null)
+            defaultTeamRegistry = new DefaultTeamRegistry();
+        //load
     }
 
     public void loadClanGymRegistry()
@@ -269,6 +282,7 @@ public class Clandorus {
         Pixelmon.EVENT_BUS.register(new RewardBuilderDialogueInputListener());
         Pixelmon.EVENT_BUS.register(new MailBuilderDialogueInputListener());
         Pixelmon.EVENT_BUS.register(new GymBuilderDialogueInputListener());
+        Pixelmon.EVENT_BUS.register(new DefaultTeamBuilderDialogueInputListener());
         Pixelmon.EVENT_BUS.register(new BattleListener());
     }
 

@@ -45,7 +45,7 @@ public class ClanGymRegistry {
         Map <Object, CommentedConfigurationNode> nodeMap = node.childrenMap();
         for (Object obj : nodeMap.keySet()) {
             if (obj == null) {
-                Clandorus.log.error("OBJ Null while generating Reward");
+                Clandorus.log.error("OBJ Null while generating Clan Gym");
                 continue;
             }
             String identifier = obj.toString();

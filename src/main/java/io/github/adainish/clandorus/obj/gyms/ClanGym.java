@@ -145,6 +145,14 @@ public class ClanGym {
         this.defaultTeamID =  ClanGymConfig.getConfig().get().node("Gyms", this.identifier, "DefaultTeam").getString();
     }
 
+    @Nullable
+    public DefaultTeam getDefaultTeam()
+    {
+        if (this.defaultTeamID.isEmpty())
+            return null;
+        return Clandorus.defaultTeamRegistry.defaultTeamHashMap.getOrDefault(this.defaultTeamID, null);
+    }
+
 
 
     public void generateClanGym()

@@ -4,6 +4,7 @@ import com.pixelmonmod.pixelmon.api.storage.PCStorage;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import io.github.adainish.clandorus.Clandorus;
+import io.github.adainish.clandorus.api.DefaultTeamBuilder;
 import io.github.adainish.clandorus.api.GymBuilder;
 import io.github.adainish.clandorus.api.MailBuilder;
 import io.github.adainish.clandorus.api.RewardBuilder;
@@ -30,6 +31,8 @@ public class Player {
     private transient RewardBuilder rewardBuilder;
 
     private transient MailBuilder mailBuilder;
+
+    private transient DefaultTeamBuilder defaultTeamBuilder;
 
     public Player(UUID uuid)
     {
@@ -162,5 +165,13 @@ public class Player {
             else return Optional.empty();
         }
         return Optional.empty();
+    }
+
+    public DefaultTeamBuilder getDefaultTeamBuilder() {
+        return defaultTeamBuilder;
+    }
+
+    public void setDefaultTeamBuilder(DefaultTeamBuilder defaultTeamBuilder) {
+        this.defaultTeamBuilder = defaultTeamBuilder;
     }
 }

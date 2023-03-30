@@ -39,6 +39,7 @@ import io.github.adainish.clandorus.enumeration.GymBuilderAction;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
 import io.github.adainish.clandorus.obj.Player;
 import io.github.adainish.clandorus.obj.gyms.ClanGym;
+import io.github.adainish.clandorus.obj.gyms.DefaultTeam;
 import io.github.adainish.clandorus.obj.mail.Reward;
 import io.github.adainish.clandorus.util.Util;
 import net.minecraft.item.Item;
@@ -904,7 +905,7 @@ public class GymBuilder {
                     .build();
         }
 
-        return PaginationHelper.createPagesFromPlaceholders(template, abilityButtonList(player), LinkedPage.builder().title(Util.formattedString("&bBanned Attacks")).template(template));
+        return PaginationHelper.createPagesFromPlaceholders(template, abilityButtonList(player), LinkedPage.builder().title(Util.formattedString("&bBanned Abilities")).template(template));
     }
 
     public GooeyPage IVSManagePage(Player player)
@@ -1013,6 +1014,84 @@ public class GymBuilder {
         return GooeyPage.builder().template(builder.build()).build();
     }
 
+    public List<Button> defaultTeamButtonList(Player player)
+    {
+        List<Button> buttons = new ArrayList<>();
+
+        for (DefaultTeam defaultTeam:Clandorus.defaultTeamRegistry.defaultTeamHashMap.values()) {
+            Pokemon firstEntry = defaultTeam.getPokemonTeam().get(0);
+            ItemStack stack = new ItemStack(Items.BARRIER);
+            if (firstEntry != null)
+                stack = SpriteItemHelper.getPhoto(firstEntry);
+            GooeyButton button = GooeyButton.builder()
+                    .title(Util.formattedString("&7%id%".replace("%id%", defaultTeam.identifier)))
+                    .display(stack)
+                    .onClick(b -> {
+                        this.gym.setDefaultTeamID(defaultTeam.identifier);
+                        UIManager.openUIForcefully(b.getPlayer(), ManageRequirementsPage(player));
+                    })
+                    .build();
+            buttons.add(button);
+        }
+
+        return buttons;
+    }
+
+    public LinkedPage DefaultTeamSelectionPage(Player player)
+    {
+        PlaceholderButton placeHolderButton = new PlaceholderButton();
+        LinkedPageButton previous = LinkedPageButton.builder()
+                .display(new ItemStack(PixelmonItems.trade_holder_left))
+                .title("Previous Page")
+                .linkType(LinkType.Previous)
+                .build();
+
+        LinkedPageButton next = LinkedPageButton.builder()
+                .display(new ItemStack(PixelmonItems.trade_holder_right))
+                .title("Next Page")
+                .linkType(LinkType.Next)
+                .build();
+
+        GooeyButton createDefaultTeam = GooeyButton.builder()
+                .title(Util.formattedString("&aCreate Team"))
+                .lore(Util.formattedArrayList(Arrays.asList("&7Click to create a new default team")))
+                .display(new ItemStack(PixelmonItems.pokemon_editor))
+                .onClick(b -> {
+                    player.setDefaultTeamBuilder(new DefaultTeamBuilder());
+                    player.getDefaultTeamBuilder().openUI(player, new DefaultTeam());
+                })
+                .build();
+
+        GooeyButton back = GooeyButton.builder()
+                .title(Util.formattedString("&eGo Back"))
+                .display(new ItemStack(PixelmonItems.eject_button))
+                .onClick(b -> {
+                    UIManager.openUIForcefully(b.getPlayer(), ManageRequirementsPage(player));
+                })
+                .build();
+
+        Template template;
+
+        if (defaultTeamButtonList(player).size() > 8) {
+            template = ChestTemplate.builder(6)
+                    .border(0, 0, 6, 9, filler)
+                    .set(0, 3, previous)
+                    .set(0, 0, back)
+                    .set(0, 5, next)
+                    .set(0, 7, createDefaultTeam)
+                    .rectangle(1, 1, 4, 7, placeHolderButton)
+                    .build();
+        } else {
+            template = ChestTemplate.builder(3)
+                    .border(0, 0, 3, 9, filler)
+                    .set(0, 0, back)
+                    .set(0, 3, createDefaultTeam)
+                    .row(1, placeHolderButton)
+                    .build();
+        }
+
+        return PaginationHelper.createPagesFromPlaceholders(template, defaultTeamButtonList(player), LinkedPage.builder().title(Util.formattedString("&aDefault Team")).template(template));
+    }
 
     public GooeyPage EditGymPage(Player player)
     {
@@ -1027,7 +1106,7 @@ public class GymBuilder {
                 .title(Util.formattedString("&7Default Team: %team%".replace("%team%", this.gym.getDefaultTeamID())))
                 .display(PokeBallRegistry.CHERISH_BALL.getValue().get().getBallItem())
                 .onClick(b -> {
-                    //go to selection page
+                    UIManager.openUIForcefully(b.getPlayer(), DefaultTeamSelectionPage(player));
                 })
                 .build();
 

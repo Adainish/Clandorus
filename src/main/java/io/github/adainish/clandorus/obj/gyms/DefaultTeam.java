@@ -31,6 +31,11 @@ public class DefaultTeam
         }
     }
 
+    public DefaultTeam()
+    {
+
+    }
+
     public List<PokemonSpecification> pokemonSpecifications()
     {
         List<PokemonSpecification> specifications = new ArrayList<>();

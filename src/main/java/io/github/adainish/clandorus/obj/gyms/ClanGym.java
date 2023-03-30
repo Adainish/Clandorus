@@ -1,6 +1,5 @@
 package io.github.adainish.clandorus.obj.gyms;
 
-import com.google.gson.Gson;
 import com.pixelmonmod.pixelmon.api.battles.BattleType;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
@@ -17,18 +16,13 @@ import io.github.adainish.clandorus.conf.ClanGymConfig;
 import io.github.adainish.clandorus.enumeration.GymWinActions;
 import io.github.adainish.clandorus.obj.*;
 import io.github.adainish.clandorus.storage.PlayerStorage;
-import io.github.adainish.clandorus.util.Adapters;
 import io.leangen.geantyref.TypeToken;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -161,6 +155,12 @@ public class ClanGym {
 
     }
 
+    public void setNPCSteve(NPCTrainer npc, String username) {
+        if (npc.getTextureIndex() != 5)
+            npc.setTextureIndex(5);
+        npc.setCustomSteveTexture(username.replaceAll("\"", ""));
+    }
+
     public String getHoldingPlayerName()
     {
         Player holding = getHoldingPlayer();
@@ -204,7 +204,7 @@ public class ClanGym {
         {
             Clandorus.clanGymRegistry.makeClanGym(this);
         }
-        Clandorus.clanGymRegistry.save(this);
+        Clandorus.clanGymRegistry.saveAll(this);
     }
 
 

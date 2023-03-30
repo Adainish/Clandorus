@@ -24,16 +24,19 @@ public class ClanGymRegistry {
     public HashMap<String, ClanGym> clanGymCache = new HashMap<>();
 
 
-    public void save()
+    public void saveAll()
     {
         for (ClanGym cl:clanGymCache.values()) {
-            save(cl);
             cl.save();
         }
     }
 
     public void load()
     {
+        if (!clanGymCache.isEmpty())
+        {
+            saveAll();
+        }
         loadFromStorage();
         loadFromConfig();
     }
@@ -123,7 +126,7 @@ public class ClanGymRegistry {
 
     public void saveAndUnload(ClanGym gym)
     {
-        save(gym);
+        saveAll(gym);
         clanGymCache.remove(gym.getIdentifier());
     }
 
@@ -165,7 +168,7 @@ public class ClanGymRegistry {
             gym.setIdentifier(newID);
         }
         clanGymCache.put(gym.getIdentifier(), gym);
-        save(gym);
+        saveAll(gym);
     }
 
     public void saveEntryToConfig(ClanGym gym)
@@ -206,7 +209,7 @@ public class ClanGymRegistry {
         clanGymCache.put(gym.getIdentifier(), gym);
     }
 
-    public void save(ClanGym gym)
+    public void saveAll(ClanGym gym)
     {
         File dir = Clandorus.clanGymStorageDir;
         File file = new File(dir, "%id%.json".replaceAll("%id%", String.valueOf(gym.getIdentifier())));
@@ -219,7 +222,7 @@ public class ClanGymRegistry {
         }
 
         if (reader == null) {
-            Clandorus.log.error("Something went wrong attempting to read the Player Data");
+            Clandorus.log.error("Something went wrong attempting to read the Clan Gym Data");
             return;
         }
 

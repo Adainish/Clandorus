@@ -145,6 +145,7 @@ public class Clandorus {
         loadClanWrapper();
         initListeners();
         initTasks();
+        loadDefaultTeamRegistry();
         loadRewardRegistry();
         loadClanGymRegistry();
         loadITechnicalMoves();
@@ -235,9 +236,10 @@ public class Clandorus {
 
     public void loadDefaultTeamRegistry()
     {
+        log.log(Level.WARN, "Loading Default Team Data from Config");
         if (defaultTeamRegistry == null)
             defaultTeamRegistry = new DefaultTeamRegistry();
-        //load
+        defaultTeamRegistry.load();
     }
 
     public void loadClanGymRegistry()
@@ -258,7 +260,9 @@ public class Clandorus {
         }
         setupConfigs();
         loadConfigs();
+        loadDefaultTeamRegistry();
         loadRewardRegistry();
+        loadClanGymRegistry();
     }
 
     public void initTasks()

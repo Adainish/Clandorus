@@ -82,6 +82,7 @@ public class BattleListener
                             }
                             gym.setActiveHoldingPlayer(event.player.getUniqueID());
                             //update npc skin
+                            gym.setNPCSteve(event.trainer, event.player.getName().getUnformattedComponentText());
                             gym.save();
                         }
                     }

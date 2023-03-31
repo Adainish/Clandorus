@@ -89,8 +89,7 @@ public class DefaultTeamBuilder {
         return builder;
     }
 
-    public GooeyPage MainMenu(Player player)
-    {
+    public GooeyPage MainMenu(Player player) {
         ChestTemplate.Builder builder = ChestTemplate.builder(6);
 
         builder.border(0, 0, 6, 9, filler);
@@ -106,6 +105,7 @@ public class DefaultTeamBuilder {
                 .build();
 
         GooeyButton addSpecs = GooeyButton.builder()
+                .title(Util.formattedString("&aAdd Pokemon Spec"))
                 .display(new ItemStack(Items.WRITABLE_BOOK))
                 .onClick(b -> {
                     if (defaultTeam.pokemonSpecs.size() >= 6) {
@@ -117,26 +117,30 @@ public class DefaultTeamBuilder {
                 .build();
 
         for (int i = 0; i < 6; i++) {
-            GooeyButton button;
-            if (i > defaultTeam.pokemonSpecs.size())
-            {
-                button = GooeyButton.builder()
-                        .title(Util.formattedString("&4&lEmpty Slot"))
-                        .display(new ItemStack(Items.BARRIER))
-                        .build();
-            } else {
-                String s = defaultTeam.pokemonSpecs.get(i);
-                PokemonSpecification specification = PokemonSpecificationProxy.create(s);
-                Pokemon p = specification.create();
-                button = GooeyButton.builder()
-                        .title(Util.formattedString("&e" + p.getSpecies().getName()))
-                        .lore(Util.formattedArrayList(Arrays.asList("&7Spec Data:", "&e" + s)))
-                        .display(SpriteItemHelper.getPhoto(specification.create()))
-                        .build();
+            GooeyButton button = GooeyButton.builder()
+                    .title(Util.formattedString("&4&lEmpty Slot"))
+                    .display(new ItemStack(Items.BARRIER))
+                    .build();
+            if (i <= defaultTeam.pokemonSpecs.size()) {
+                try {
+                    String s = defaultTeam.pokemonSpecs.get(i);
+                    if (s != null) {
+                        PokemonSpecification specification = PokemonSpecificationProxy.create(s);
+                        Pokemon p = specification.create();
+                        button = GooeyButton.builder()
+                                .title(Util.formattedString("&e" + p.getSpecies().getName()))
+                                .lore(Util.formattedArrayList(Arrays.asList("&7Spec Data:", "&e" + s)))
+                                .display(SpriteItemHelper.getPhoto(specification.create()))
+                                .build();
+                    }
+                } catch (IndexOutOfBoundsException e)
+                {
+
+                }
             }
             builder.set(0, 3, finish);
             builder.set(0, 5, addSpecs);
-            builder.set(1, 1 + (i + 2), button);
+            builder.set(1, (i + 1), button);
         }
 
         return GooeyPage.builder().template(builder.build()).build();

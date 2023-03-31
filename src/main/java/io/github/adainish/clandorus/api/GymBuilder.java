@@ -1028,7 +1028,7 @@ public class GymBuilder {
                     .display(stack)
                     .onClick(b -> {
                         this.gym.setDefaultTeamID(defaultTeam.identifier);
-                        UIManager.openUIForcefully(b.getPlayer(), ManageRequirementsPage(player));
+                        UIManager.openUIForcefully(b.getPlayer(), EditGymPage(player));
                     })
                     .build();
             buttons.add(button);
@@ -1066,7 +1066,7 @@ public class GymBuilder {
                 .title(Util.formattedString("&eGo Back"))
                 .display(new ItemStack(PixelmonItems.eject_button))
                 .onClick(b -> {
-                    UIManager.openUIForcefully(b.getPlayer(), ManageRequirementsPage(player));
+                    UIManager.openUIForcefully(b.getPlayer(), EditGymPage(player));
                 })
                 .build();
 

@@ -17,40 +17,37 @@ public class DefaultTeamBuilderDialogueInputListener
     {
         Player player = PlayerStorage.getPlayer(event.getPlayer().getUniqueID());
         if (player != null) {
-            if (player.getDefaultTeamBuilder() != null)
-            {
+            if (player.getDefaultTeamBuilder() != null) {
                 String input = event.getInput();
-                switch (player.getDefaultTeamBuilder().getTeamBuilderAction())
-                {
-                    case specs_error:
-                    case specs:
-                    {
-                        if (input.isEmpty())
-                        {
-                            player.getDefaultTeamBuilder().setTeamBuilderAction(DefaultTeamBuilderAction.specs_error);
-                            player.getDefaultTeamBuilder().dialogueInputScreenBuilder(DefaultTeamBuilderAction.specs_error, player).sendTo(player.getServerEntity());
-                        } else {
-                            PokemonSpecification spec = PokemonSpecificationProxy.create(input);
-                            if (spec.create() == null || spec.create().getSpecies().equals(PixelmonSpecies.MISSINGNO.getValueUnsafe())) {
+                if (player.getDefaultTeamBuilder().getTeamBuilderAction() != null) {
+                    switch (player.getDefaultTeamBuilder().getTeamBuilderAction()) {
+                        case specs_error:
+                        case specs: {
+                            if (input.isEmpty()) {
                                 player.getDefaultTeamBuilder().setTeamBuilderAction(DefaultTeamBuilderAction.specs_error);
                                 player.getDefaultTeamBuilder().dialogueInputScreenBuilder(DefaultTeamBuilderAction.specs_error, player).sendTo(player.getServerEntity());
-                                return;
+                            } else {
+                                PokemonSpecification spec = PokemonSpecificationProxy.create(input);
+                                if (spec.create() == null || spec.create().getSpecies().equals(PixelmonSpecies.MISSINGNO.getValueUnsafe())) {
+                                    player.getDefaultTeamBuilder().setTeamBuilderAction(DefaultTeamBuilderAction.specs_error);
+                                    player.getDefaultTeamBuilder().dialogueInputScreenBuilder(DefaultTeamBuilderAction.specs_error, player).sendTo(player.getServerEntity());
+                                    return;
+                                }
+
+                                player.getDefaultTeamBuilder().setTeamBuilderAction(DefaultTeamBuilderAction.none);
+                                player.getDefaultTeamBuilder().getDefaultTeam().pokemonSpecs.add(input);
+
+                                Scheduling.schedule(2, () -> {
+                                    player.getDefaultTeamBuilder().openUI(player, player.getDefaultTeamBuilder().getDefaultTeam());
+                                }, false);
                             }
-
-                            player.getDefaultTeamBuilder().setTeamBuilderAction(DefaultTeamBuilderAction.none);
-                            player.getDefaultTeamBuilder().getDefaultTeam().pokemonSpecs.add(input);
-
-                            Scheduling.schedule(2, () -> {
-                                player.getDefaultTeamBuilder().openUI(player, player.getDefaultTeamBuilder().getDefaultTeam());
-                            }, false);
+                            break;
                         }
-                        break;
-                    }
-                    case none:
-                    default:
-                    {
+                        case none:
+                        default: {
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }

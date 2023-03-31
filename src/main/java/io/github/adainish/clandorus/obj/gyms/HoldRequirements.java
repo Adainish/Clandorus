@@ -131,7 +131,6 @@ public class HoldRequirements
     public boolean isAllowed(Pokemon pokemon)
     {
         if (isBanned(pokemon)) {
-            Clandorus.log.warn("Spec");
             return false;
         }
 
@@ -143,22 +142,13 @@ public class HoldRequirements
         }
 
         if (isAbilityBanned(pokemon.getAbility())) {
-            Clandorus.log.warn("Ability");
             return false;
         }
 
         if (isMoveSetBanned(pokemon.getMoveset())) {
-            Clandorus.log.warn("Move");
             return false;
         }
 
-        if (counter < min31Ivs)
-        {
-            Clandorus.log.warn("IVS");
-            return false;
-        } else {
-
-            return true;
-        }
+        return counter >= min31Ivs;
     }
 }

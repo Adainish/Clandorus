@@ -242,16 +242,8 @@ public class GymWinAction {
             gym.setActiveHoldingPlayer(null);
             gym.setOccupyingHolder(null);
         }
-        this.newClan = null;
-        this.npcTrainer = null;
-        this.player = null;
-        this.stolenPokemon = null;
-        this.completedAction = true;
+
         gym.save();
-
-
-
-
     }
 
     public LinkedPage PokemonSelectionMenu()

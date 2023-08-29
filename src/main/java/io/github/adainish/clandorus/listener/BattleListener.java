@@ -51,7 +51,8 @@ public class BattleListener
                                 {
                                     if (clan.isMember(holder))
                                     {
-                                        player.sendMessage("&cYou can't take challenge a Clan Gym that's being held by your Clan!");
+                                        player.sendMessage("&cYou can't challenge a Clan Gym that's being held by your Clan!");
+                                        event.setCanceled(true);
                                         return;
                                     }
                                 }

@@ -37,12 +37,17 @@ public class ClanChatCommand {
                                 }
                                 if (player.inClan()) {
                                     Clan clan = ClanStorage.getClan(player.getClanID());
-                                    if (clan != null)
+
+                                    if (clan != null) {
+
+                                        if (clan.getClanChat() == null) {
+                                            clan.setClanChat(new ClanChat());
+                                            clan.save();
+                                        }
                                         clan.getClanChat().sendClanMessage(clan, player, msgBuilder.toString());
-                                    else Util.sendFailMessage(entity, "Could not retrieve clan data");
+                                    } else Util.sendFailMessage(entity, "Could not retrieve clan data");
                                 }
-                            } catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
